@@ -41,7 +41,7 @@ struct SettingsView: View {
               )
             )
           }
-          .glassEffect(.regular)
+          .glassEffect(.clear)
         }
 
         // Calendar Settings
@@ -70,7 +70,7 @@ struct SettingsView: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 14)
           }
-          .glassEffect(.regular)
+          .glassEffect(.clear)
         }
 
         // App Settings
