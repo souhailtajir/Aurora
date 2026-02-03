@@ -41,7 +41,7 @@ struct SettingsView: View {
               )
             )
           }
-          .glassEffect(.clear)
+          .glassEffect(.regular)
         }
 
         // Calendar Settings
