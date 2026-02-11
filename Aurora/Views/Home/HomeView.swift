@@ -80,11 +80,12 @@ struct HomeView: View {
     var pinnedItems: [PinnedCardItem] = []
 
     // Add smart lists in their stored order
+    
     for listType in taskStore.pinnedHomeSmartLists {
       pinnedItems.append(.smartList(listType))
     }
 
-    // Add categories in their stored order
+
     for categoryId in taskStore.pinnedHomeCategoryIds {
       if let category = taskStore.categories.first(where: { $0.id == categoryId }) {
         pinnedItems.append(.category(category))
