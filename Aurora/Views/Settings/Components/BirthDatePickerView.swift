@@ -1,9 +1,8 @@
 //
 //  BirthDatePickerView.swift
 //  Aurora
-//
 //  Created by souhail on 12/18/25.
-//
+
 
 import SwiftUI
 
@@ -46,7 +45,7 @@ struct BirthDatePickerView: View {
           }
           .frame(maxWidth: .infinity)
           .padding(.vertical, 32)
-          .glassEffect(.regular)
+          .glassEffect(.clear)
           .padding(.horizontal, 20)
 
           // Date Picker Card
