@@ -98,7 +98,7 @@ struct SettingsView: View {
             }
             .buttonStyle(.plain)
           }
-          .glassEffect(.regular)
+          .glassEffect(.clear)
         }
 
         // Sounds & Haptics
