@@ -67,7 +67,7 @@ struct CategoryTasksView: View {
       }
 
     case .category(let category):
-      return taskStore.tasks.filter { $0.category.id == category.id && !$0.isCompleted }
+      return taskStore.tasks.filter { $0.category?.id == category.id && !$0.isCompleted }
     }
   }
 
@@ -204,12 +204,5 @@ struct CategoryTasksView: View {
       editingTaskId = newTask.id
       focusedTaskId = newTask.id
     }
-  }
-}
-
-#Preview {
-  NavigationStack {
-    CategoryTasksView(filterType: .smartList(.today))
-      .environment(TaskStore())
   }
 }

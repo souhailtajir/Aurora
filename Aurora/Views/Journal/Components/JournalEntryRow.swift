@@ -52,21 +52,3 @@ struct JournalEntryRow: View {
     }
   }
 }
-
-#Preview {
-  ZStack {
-    Color.black.ignoresSafeArea()
-    VStack(spacing: 8) {
-      JournalEntryRow(
-        entry: JournalEntry(title: "Morning Thoughts", body: "", date: Date()),
-        onTap: {}
-      )
-      JournalEntryRow(
-        entry: JournalEntry(title: "", body: "", date: Date()),
-        onTap: {}
-      )
-    }
-    .padding()
-    .environment(TaskStore())
-  }
-}

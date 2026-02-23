@@ -348,6 +348,6 @@ struct TasksView: View {
   }
 
   private func getCount(for category: TaskCategory) -> Int {
-    taskStore.tasks.filter { $0.category.id == category.id && !$0.isCompleted }.count
+    taskStore.tasks.filter { $0.category?.id == category.id && !$0.isCompleted }.count
   }
 }
