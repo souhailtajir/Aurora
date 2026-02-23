@@ -266,7 +266,7 @@ struct TasksView: View {
       }
       .padding(.horizontal, 16)
       .padding(.vertical, 14)
-      .glassEffect()
+      .glassEffect(.clear)
     }
     .buttonStyle(.plain)
   }
