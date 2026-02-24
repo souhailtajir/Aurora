@@ -5,20 +5,53 @@
 //  Created by souhail on 12/4/25.
 //
 
+//
+//  JournalModels.swift
+//  Aurora
+//
+//  Created by souhail on 12/4/25.
+//
+
 import Foundation
+import SwiftData
 import SwiftUI
 
-struct JournalEntry: Identifiable, Codable, Hashable, Sendable {
-  var id: UUID = UUID()
+@Model
+final class JournalEntry {
+  @Attribute(.unique) var id: UUID
   var title: String
   var body: String
   var date: Date
-  var theme: JournalTheme = .system
-  var images: [Data] = []
-  var deletedAt: Date? = nil
-  var locationName: String? = nil
-  var latitude: Double? = nil
-  var longitude: Double? = nil
+  var theme: JournalTheme
+  @Attribute(.externalStorage) var images: [Data] = []
+  var deletedAt: Date?
+  var locationName: String?
+  var latitude: Double?
+  var longitude: Double?
+
+  init(
+    id: UUID = UUID(),
+    title: String,
+    body: String,
+    date: Date,
+    theme: JournalTheme = .system,
+    images: [Data] = [],
+    deletedAt: Date? = nil,
+    locationName: String? = nil,
+    latitude: Double? = nil,
+    longitude: Double? = nil
+  ) {
+    self.id = id
+    self.title = title
+    self.body = body
+    self.date = date
+    self.theme = theme
+    self.images = images
+    self.deletedAt = deletedAt
+    self.locationName = locationName
+    self.latitude = latitude
+    self.longitude = longitude
+  }
 }
 
 enum JournalTheme: String, Codable, CaseIterable, Sendable {

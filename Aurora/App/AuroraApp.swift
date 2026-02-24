@@ -6,11 +6,30 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct AuroraApp: App {
-  @State private var taskStore = TaskStore()
+  let container: ModelContainer
+  @State private var taskStore: TaskStore
   @State private var userProfileStore = UserProfileStore()
+
+  init() {
+    do {
+      let schema = Schema([
+        Task.self,
+        TaskCategory.self,
+        JournalEntry.self
+      ])
+      let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+      container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+      
+      let store = TaskStore(modelContext: container.mainContext)
+      _taskStore = State(initialValue: store)
+    } catch {
+      fatalError("Could not create ModelContainer: \(error)")
+    }
+  }
 
   var body: some Scene {
     WindowGroup {
@@ -19,5 +38,6 @@ struct AuroraApp: App {
         .environment(userProfileStore)
         .preferredColorScheme(.dark)
     }
+    .modelContainer(container)
   }
 }

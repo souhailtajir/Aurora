@@ -93,8 +93,3 @@ struct SmartListIcon: View {
     }
   }
 }
-
-#Preview {
-  SmartListsCustomizationSheet()
-    .environment(TaskStore())
-}

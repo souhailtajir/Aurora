@@ -5,7 +5,15 @@
 //  Created by souhail on 12/1/25.
 //
 
+//
+//  TaskModels.swift
+//  Aurora
+//
+//  Created by souhail on 12/1/25.
+//
+
 import Foundation
+import SwiftData
 import SwiftUI
 
 enum TaskPriority: String, Codable, CaseIterable, Identifiable, Sendable {
@@ -26,11 +34,12 @@ enum TaskPriority: String, Codable, CaseIterable, Identifiable, Sendable {
   }
 }
 
-struct Task: Identifiable, Codable, Sendable, Equatable {
-  let id: UUID
+@Model
+final class Task {
+  @Attribute(.unique) var id: UUID
   var title: String
   var date: Date?
-  var category: TaskCategory
+  var category: TaskCategory?
   var isCompleted: Bool
   var isFlagged: Bool
   var hasReminder: Bool
@@ -45,7 +54,7 @@ struct Task: Identifiable, Codable, Sendable, Equatable {
     url: String = "",
     date: Date? = nil,
     priority: TaskPriority = .none,
-    category: TaskCategory = .personal,
+    category: TaskCategory? = nil,
     isCompleted: Bool = false,
     isFlagged: Bool = false,
     hasReminder: Bool = false
@@ -70,11 +79,15 @@ struct Task: Identifiable, Codable, Sendable, Equatable {
   }
 }
 
-struct TaskCategory: Identifiable, Codable, Hashable, Sendable {
-  let id: UUID
+@Model
+final class TaskCategory {
+  @Attribute(.unique) var id: UUID
   var name: String
   var colorHex: String
   var iconName: String
+  
+  @Relationship(deleteRule: .cascade, inverse: \Task.category)
+  var tasks: [Task] = []
 
   init(id: UUID = UUID(), name: String, colorHex: String, iconName: String) {
     self.id = id
@@ -83,14 +96,27 @@ struct TaskCategory: Identifiable, Codable, Hashable, Sendable {
     self.iconName = iconName
   }
 
-  static let reminders = TaskCategory(
-    name: "Reminders", colorHex: "#007AFF", iconName: "list.bullet")
-  static let personal = TaskCategory(name: "Personal", colorHex: "#B366F3", iconName: "person.fill")
-  static let work = TaskCategory(name: "Work", colorHex: "#66B3FF", iconName: "briefcase.fill")
-  static let shopping = TaskCategory(name: "Shopping", colorHex: "#66D980", iconName: "cart.fill")
-  static let health = TaskCategory(name: "Health", colorHex: "#FF6680", iconName: "heart.fill")
+  static func defaults() -> [TaskCategory] {
+    [
+      TaskCategory(name: "Reminders", colorHex: "#007AFF", iconName: "list.bullet"),
+      TaskCategory(name: "Personal", colorHex: "#B366F3", iconName: "person.fill"),
+      TaskCategory(name: "Work", colorHex: "#66B3FF", iconName: "briefcase.fill"),
+      TaskCategory(name: "Shopping", colorHex: "#66D980", iconName: "cart.fill"),
+      TaskCategory(name: "Health", colorHex: "#FF6680", iconName: "heart.fill")
+    ]
+  }
+  
+  // Helper for "Personal" default fallback if needed
+  static var personalPlaceholder: TaskCategory {
+      TaskCategory(name: "Personal", colorHex: "#B366F3", iconName: "person.fill")
+  }
 
-  static let defaults: [TaskCategory] = [.reminders, .personal, .work, .shopping, .health]
+  // MARK: - Unmanaged Defaults for UI Initialization
+  static var reminders: TaskCategory { TaskCategory(name: "Reminders", colorHex: "#007AFF", iconName: "list.bullet") }
+  static var personal: TaskCategory { TaskCategory(name: "Personal", colorHex: "#B366F3", iconName: "person.fill") }
+  static var work: TaskCategory { TaskCategory(name: "Work", colorHex: "#66B3FF", iconName: "briefcase.fill") }
+  static var shopping: TaskCategory { TaskCategory(name: "Shopping", colorHex: "#66D980", iconName: "cart.fill") }
+  static var health: TaskCategory { TaskCategory(name: "Health", colorHex: "#FF6680", iconName: "heart.fill") }
 }
 
 enum TaskFilter: String, CaseIterable, Identifiable, Sendable {
@@ -103,6 +129,8 @@ enum TaskFilter: String, CaseIterable, Identifiable, Sendable {
 }
 
 /// Settings for app customization that need to be persisted
+/// Note: Depending on preference, this could also be a @Model or stay as Codable in UserDefaults/JSON.
+/// Keeping as Codable for now as it's configuration, not "user content" like tasks.
 struct AppSettings: Codable {
   var visibleSmartLists: [SmartListType]
   var visibleCategories: [UUID]

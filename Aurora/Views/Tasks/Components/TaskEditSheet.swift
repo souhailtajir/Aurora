@@ -77,17 +77,17 @@ struct TaskEditSheet: View {
         }) {
             HStack(spacing: 12) {
                 Circle()
-                    .fill(Theme.categoryColor(for: draftTask.category).opacity(0.25))
+                    .fill((draftTask.category.map { Theme.categoryColor(for: $0) } ?? .gray).opacity(0.25))
                     .frame(width: 44, height: 44)
                     .overlay(
                         Circle()
-                            .strokeBorder(Theme.categoryColor(for: draftTask.category), lineWidth: 2)
+                            .strokeBorder(draftTask.category.map { Theme.categoryColor(for: $0) } ?? .gray, lineWidth: 2)
                     )
                     .overlay(
                         draftTask.isCompleted ?
                         Image(systemName: "checkmark")
                             .font(.system(size: 18, weight: .bold))
-                            .foregroundStyle(Theme.categoryColor(for: draftTask.category))
+                            .foregroundStyle(draftTask.category.map { Theme.categoryColor(for: $0) } ?? .gray)
                         : nil
                     )
                 
@@ -144,9 +144,9 @@ struct TaskEditSheet: View {
                 } label: {
                     HStack(spacing: 6) {
                         Circle()
-                            .fill(Theme.categoryColor(for: draftTask.category))
+                            .fill(draftTask.category.map { Theme.categoryColor(for: $0) } ?? .gray)
                             .frame(width: 8, height: 8)
-                        Text(draftTask.category.name)
+                        Text(draftTask.category?.name ?? "None")
                             .font(.system(size: 13, weight: .medium))
                             .foregroundStyle(.white)
                     }
@@ -154,7 +154,7 @@ struct TaskEditSheet: View {
                     .padding(.vertical, 8)
                     .background(
                         Capsule()
-                            .fill(Theme.categoryColor(for: draftTask.category))
+                            .fill(draftTask.category.map { Theme.categoryColor(for: $0) } ?? .gray)
                     )
                 }
                 

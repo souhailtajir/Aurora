@@ -7,6 +7,7 @@
 
 import Observation
 import SwiftUI
+import SwiftData
 
 @Observable
 final class TaskStore {
@@ -14,355 +15,214 @@ final class TaskStore {
   var categories: [TaskCategory] = []
   var journalEntries: [JournalEntry] = []
   var deletedJournalEntries: [JournalEntry] = []
+  
   var addTaskTrigger: AddTaskTrigger = .none
   var addJournalTrigger: Bool = false
 
-  // Smart list visibility settings
-  var visibleSmartLists: Set<SmartListType> = [.today, .all, .flagged] {
-    didSet { scheduleSaveSettings() }
-  }
-  var visibleCategories: Set<UUID> = [] {
-    didSet { scheduleSaveSettings() }
-  }
-  var smartListOrder: [SmartListType] = [] {
-    didSet { scheduleSaveSettings() }
-  }
-  var pinnedHomeSmartLists: [SmartListType] = [.flagged] {
-    didSet { scheduleSaveSettings() }
-  }
-  var pinnedHomeCategoryIds: [UUID] = [] {
-    didSet { scheduleSaveSettings() }
-  }
-  var weekStartsOnMonday: Bool = true {
-    didSet { scheduleSaveSettings() }
-  }
+  // MARK: - Settings
+  var visibleSmartLists: Set<SmartListType> = [.today, .all, .flagged] { didSet { saveSettings() } }
+  var visibleCategories: Set<UUID> = [] { didSet { saveSettings() } }
+  var smartListOrder: [SmartListType] = [] { didSet { saveSettings() } }
+  var pinnedHomeSmartLists: [SmartListType] = [.flagged] { didSet { saveSettings() } }
+  var pinnedHomeCategoryIds: [UUID] = [] { didSet { saveSettings() } }
+  var weekStartsOnMonday: Bool = true { didSet { saveSettings() } }
   var myListsExpanded: Bool = true
 
   enum AddTaskTrigger {
     case none, home, tasks
   }
 
-  // MARK: - Debounce Infrastructure
-  private let saveQueue = DispatchQueue(label: "com.aurora.save", qos: .utility)
-  private var pendingTasksSave: DispatchWorkItem?
-  private var pendingJournalSave: DispatchWorkItem?
-  private var pendingCategoriesSave: DispatchWorkItem?
-  private var pendingSettingsSave: DispatchWorkItem?
-  private let saveDebounceInterval: TimeInterval = 0.5
+  private var modelContext: ModelContext
 
-  init() {
-    load()
+  init(modelContext: ModelContext) {
+    self.modelContext = modelContext
+    loadSettings()
+    loadData()
+  }
+  
+  // MARK: - Data Loading
+  func loadData() {
+    fetchCategories()
+    fetchTasks()
+    fetchJournal()
+  }
+  
+  private func fetchCategories() {
+    do {
+      let descriptor = FetchDescriptor<TaskCategory>(sortBy: [SortDescriptor(\.name)])
+      categories = try modelContext.fetch(descriptor)
+      
+      if categories.isEmpty {
+        seedCategories()
+      }
+    } catch {
+      print("Failed to fetch categories: \(error)")
+    }
+  }
+  
+  private func fetchTasks() {
+    do {
+      let descriptor = FetchDescriptor<Task>(sortBy: [SortDescriptor(\.date)])
+      tasks = try modelContext.fetch(descriptor)
+    } catch {
+      print("Failed to fetch tasks: \(error)")
+    }
+  }
+  
+  private func fetchJournal() {
+    do {
+      let descriptor = FetchDescriptor<JournalEntry>(predicate: #Predicate { $0.deletedAt == nil }, sortBy: [SortDescriptor(\.date, order: .reverse)])
+      journalEntries = try modelContext.fetch(descriptor)
+      
+      let deletedDescriptor = FetchDescriptor<JournalEntry>(predicate: #Predicate { $0.deletedAt != nil }, sortBy: [SortDescriptor(\.deletedAt, order: .reverse)])
+      deletedJournalEntries = try modelContext.fetch(deletedDescriptor)
+    } catch {
+      print("Failed to fetch journal: \(error)")
+    }
+  }
+  
+  private func seedCategories() {
+    let defaults = TaskCategory.defaults()
+    for cat in defaults {
+      modelContext.insert(cat)
+    }
+    saveContext()
+    fetchCategories() // Reload to get the managed objects
   }
 
   // MARK: - Task Management
   func addTask(_ task: Task) {
-    tasks.append(task)
-    scheduleSaveTasks()
+    // If task has a category that isn't persistent, try to find matching existing category or default
+    if task.category == nil || task.category?.modelContext == nil {
+        if let defaultCat = categories.first(where: { $0.name == "Personal" }) ?? categories.first {
+            task.category = defaultCat
+        }
+    }
+      
+    modelContext.insert(task)
+    saveContext()
+    fetchTasks()
   }
 
   func updateTask(_ task: Task) {
-    if let index = tasks.firstIndex(where: { $0.id == task.id }) {
-      tasks[index] = task
-      scheduleSaveTasks()
-    }
+    // SwiftData objects are reference types, so modifying properties updates the object.
+    // We just need to save.
+    saveContext()
+    // Trigger UI refresh if needed (arrays might need re-fetching if sort order changed)
+    fetchTasks()
   }
 
   func deleteTask(_ task: Task) {
-    tasks.removeAll { $0.id == task.id }
-    scheduleSaveTasks()
+    modelContext.delete(task)
+    saveContext()
+    fetchTasks()
   }
 
   func toggleTaskCompletion(_ task: Task) {
-    if let index = tasks.firstIndex(where: { $0.id == task.id }) {
-      tasks[index].isCompleted.toggle()
-      scheduleSaveTasks()
-    }
+    task.isCompleted.toggle()
+    saveContext()
+    fetchTasks()
   }
 
   func clearCompletedTasks() {
-    tasks.removeAll { $0.isCompleted }
-    scheduleSaveTasks()
+    for task in tasks where task.isCompleted {
+        modelContext.delete(task)
+    }
+    saveContext()
+    fetchTasks()
   }
 
   // MARK: - Category Management
   func addCategory(_ category: TaskCategory) {
-    categories.append(category)
-    scheduleSaveCategories()
+    modelContext.insert(category)
+    saveContext()
+    fetchCategories()
   }
 
   func deleteCategory(_ category: TaskCategory) {
-    categories.removeAll { $0.id == category.id }
-    scheduleSaveCategories()
+    modelContext.delete(category)
+    saveContext()
+    fetchCategories()
+    fetchTasks() // Tasks might be deleted or affected
   }
 
   func updateCategory(_ category: TaskCategory) {
-    if let index = categories.firstIndex(where: { $0.id == category.id }) {
-      categories[index] = category
-      scheduleSaveCategories()
-    }
+    saveContext()
+    fetchCategories()
   }
 
   // MARK: - Journal Management
   func addJournalEntry(_ entry: JournalEntry) {
-    journalEntries.append(entry)
-    scheduleSaveJournal()
+    modelContext.insert(entry)
+    saveContext()
+    fetchJournal()
   }
 
   func deleteJournalEntry(_ entry: JournalEntry) {
-    var deletedEntry = entry
-    deletedEntry.deletedAt = Date()
-    journalEntries.removeAll { $0.id == entry.id }
-    deletedJournalEntries.append(deletedEntry)
-    scheduleSaveJournal()
-    scheduleSaveDeletedJournal()
+    entry.deletedAt = Date()
+    saveContext()
+    fetchJournal()
   }
 
   func permanentlyDeleteJournalEntry(_ entry: JournalEntry) {
-    deletedJournalEntries.removeAll { $0.id == entry.id }
-    scheduleSaveDeletedJournal()
+    modelContext.delete(entry)
+    saveContext()
+    fetchJournal()
   }
 
   func restoreJournalEntry(_ entry: JournalEntry) {
-    var restoredEntry = entry
-    restoredEntry.deletedAt = nil
-    deletedJournalEntries.removeAll { $0.id == entry.id }
-    journalEntries.append(restoredEntry)
-    scheduleSaveJournal()
-    scheduleSaveDeletedJournal()
+    entry.deletedAt = nil
+    saveContext()
+    fetchJournal()
   }
 
   func cleanupOldDeletedEntries() {
-    let thirtyDaysAgo = Calendar.current.date(byAdding: .day, value: -30, to: Date()) ?? Date()
-    let hadEntries = !deletedJournalEntries.isEmpty
-    deletedJournalEntries.removeAll { entry in
-      guard let deletedAt = entry.deletedAt else { return false }
-      return deletedAt < thirtyDaysAgo
-    }
-    if hadEntries {
-      scheduleSaveDeletedJournal()
-    }
+      // Fetch directly from deleted list logic or just iterate
+      // Logic handled in fetch or manually here.
+      let thirtyDaysAgo = Calendar.current.date(byAdding: .day, value: -30, to: Date()) ?? Date()
+      for entry in deletedJournalEntries {
+          if let deletedAt = entry.deletedAt, deletedAt < thirtyDaysAgo {
+              modelContext.delete(entry)
+          }
+      }
+      saveContext()
+      fetchJournal()
   }
 
   func updateJournalEntry(_ entry: JournalEntry) {
-    if let index = journalEntries.firstIndex(where: { $0.id == entry.id }) {
-      journalEntries[index] = entry
-      scheduleSaveJournal()
-    }
+    saveContext()
+    fetchJournal()
   }
 
-  // MARK: - Debounced Save Scheduling
-  private func scheduleSaveTasks() {
-    pendingTasksSave?.cancel()
-    let workItem = DispatchWorkItem { [weak self] in
-      self?.performSaveTasks()
-    }
-    pendingTasksSave = workItem
-    saveQueue.asyncAfter(deadline: .now() + saveDebounceInterval, execute: workItem)
+  // MARK: - Persistence Helper
+  private func saveContext() {
+    try? modelContext.save()
   }
 
-  private func scheduleSaveCategories() {
-    pendingCategoriesSave?.cancel()
-    let workItem = DispatchWorkItem { [weak self] in
-      self?.performSaveCategories()
-    }
-    pendingCategoriesSave = workItem
-    saveQueue.asyncAfter(deadline: .now() + saveDebounceInterval, execute: workItem)
+  // MARK: - Settings Persistence (UserDefaults)
+  private func loadSettings() {
+      if let data = UserDefaults.standard.data(forKey: "AppSettings"),
+         let settings = try? JSONDecoder().decode(AppSettings.self, from: data) {
+          self.visibleSmartLists = Set(settings.visibleSmartLists)
+          self.visibleCategories = Set(settings.visibleCategories)
+          self.smartListOrder = settings.smartListOrder
+          self.pinnedHomeSmartLists = settings.pinnedHomeSmartLists
+          self.pinnedHomeCategoryIds = settings.pinnedHomeCategoryIds
+          self.weekStartsOnMonday = settings.weekStartsOnMonday
+      }
   }
 
-  private func scheduleSaveJournal() {
-    pendingJournalSave?.cancel()
-    let workItem = DispatchWorkItem { [weak self] in
-      self?.performSaveJournal()
-    }
-    pendingJournalSave = workItem
-    saveQueue.asyncAfter(deadline: .now() + saveDebounceInterval, execute: workItem)
-  }
-
-  private func scheduleSaveDeletedJournal() {
-    // Deleted journal saves immediately (less frequent operation)
-    saveQueue.async { [weak self] in
-      self?.performSaveDeletedJournal()
-    }
-  }
-
-  private func scheduleSaveSettings() {
-    pendingSettingsSave?.cancel()
-    let workItem = DispatchWorkItem { [weak self] in
-      self?.performSaveSettings()
-    }
-    pendingSettingsSave = workItem
-    saveQueue.asyncAfter(deadline: .now() + saveDebounceInterval, execute: workItem)
-  }
-
-  // MARK: - Persistence (Background Thread)
-  private func getDocumentsDirectory() -> URL {
-    FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-  }
-
-  private func performSaveTasks() {
-    let tasksToSave = tasks
-    let url = getDocumentsDirectory().appendingPathComponent("tasks.json")
-    do {
-      let data = try JSONEncoder().encode(tasksToSave)
-      try data.write(to: url, options: .atomic)
-    } catch {
-      print("Failed to save tasks: \(error)")
-    }
-  }
-
-  private func performSaveCategories() {
-    let categoriesToSave = categories
-    let url = getDocumentsDirectory().appendingPathComponent("categories.json")
-    do {
-      let data = try JSONEncoder().encode(categoriesToSave)
-      try data.write(to: url, options: .atomic)
-    } catch {
-      print("Failed to save categories: \(error)")
-    }
-  }
-
-  private func performSaveJournal() {
-    let entriesToSave = journalEntries
-    let url = getDocumentsDirectory().appendingPathComponent("journal.json")
-    do {
-      let data = try JSONEncoder().encode(entriesToSave)
-      try data.write(to: url, options: .atomic)
-    } catch {
-      print("Failed to save journal: \(error)")
-    }
-  }
-
-  private func performSaveDeletedJournal() {
-    let entriesToSave = deletedJournalEntries
-    let url = getDocumentsDirectory().appendingPathComponent("deleted_journal.json")
-    do {
-      let data = try JSONEncoder().encode(entriesToSave)
-      try data.write(to: url, options: .atomic)
-    } catch {
-      print("Failed to save deleted journal: \(error)")
-    }
-  }
-
-  private func performSaveSettings() {
-    let settings = AppSettings(
-      visibleSmartLists: Array(visibleSmartLists),
-      visibleCategories: Array(visibleCategories),
-      smartListOrder: smartListOrder,
-      pinnedHomeSmartLists: Array(pinnedHomeSmartLists),
-      pinnedHomeCategoryIds: Array(pinnedHomeCategoryIds),
-      weekStartsOnMonday: weekStartsOnMonday
-    )
-    let url = getDocumentsDirectory().appendingPathComponent("settings.json")
-    do {
-      let data = try JSONEncoder().encode(settings)
-      try data.write(to: url, options: .atomic)
-    } catch {
-      print("Failed to save settings: \(error)")
-    }
-  }
-
-  // Force immediate save (call before app termination)
-  func saveImmediately() {
-    pendingTasksSave?.cancel()
-    pendingJournalSave?.cancel()
-    pendingCategoriesSave?.cancel()
-    pendingSettingsSave?.cancel()
-
-    saveQueue.sync {
-      performSaveTasks()
-      performSaveCategories()
-      performSaveJournal()
-      performSaveDeletedJournal()
-      performSaveSettings()
-    }
-  }
-
-  private func load() {
-    let tasksUrl = getDocumentsDirectory().appendingPathComponent("tasks.json")
-    let categoriesUrl = getDocumentsDirectory().appendingPathComponent("categories.json")
-    let journalUrl = getDocumentsDirectory().appendingPathComponent("journal.json")
-
-    // Load Categories
-    do {
-      let data = try Data(contentsOf: categoriesUrl)
-      categories = try JSONDecoder().decode([TaskCategory].self, from: data)
-    } catch {
-      categories = TaskCategory.defaults
-      scheduleSaveCategories()
-    }
-
-    // Load Tasks
-    do {
-      let data = try Data(contentsOf: tasksUrl)
-      tasks = try JSONDecoder().decode([Task].self, from: data)
-    } catch {
-      loadSampleData()
-      scheduleSaveTasks()
-    }
-
-    // Load Journal
-    do {
-      let data = try Data(contentsOf: journalUrl)
-      journalEntries = try JSONDecoder().decode([JournalEntry].self, from: data)
-    } catch {
-      journalEntries = []
-    }
-
-    // Load Deleted Journal
-    let deletedJournalUrl = getDocumentsDirectory().appendingPathComponent("deleted_journal.json")
-    do {
-      let data = try Data(contentsOf: deletedJournalUrl)
-      deletedJournalEntries = try JSONDecoder().decode([JournalEntry].self, from: data)
-      cleanupOldDeletedEntries()
-    } catch {
-      deletedJournalEntries = []
-    }
-
-    // Load Settings
-    let settingsUrl = getDocumentsDirectory().appendingPathComponent("settings.json")
-    do {
-      let data = try Data(contentsOf: settingsUrl)
-      let settings = try JSONDecoder().decode(AppSettings.self, from: data)
-      visibleSmartLists = Set(settings.visibleSmartLists)
-      visibleCategories = Set(settings.visibleCategories)
-      smartListOrder = settings.smartListOrder
-      pinnedHomeSmartLists = settings.pinnedHomeSmartLists
-      pinnedHomeCategoryIds = settings.pinnedHomeCategoryIds
-      weekStartsOnMonday = settings.weekStartsOnMonday
-    } catch {
-      // Use defaults
-      visibleSmartLists = [.today, .all, .flagged]
-      smartListOrder = []
-      pinnedHomeSmartLists = [.flagged]
-      pinnedHomeCategoryIds = []
-      weekStartsOnMonday = true
-    }
-  }
-
-  private func loadSampleData() {
-    let calendar = Calendar.current
-    let now = Date()
-
-    tasks = [
-      Task(
-        title: "Follow up with a client",
-        date: calendar.date(bySettingHour: 10, minute: 30, second: 0, of: now), priority: .medium,
-        category: .work, hasReminder: true),
-      Task(
-        title: "Send design mocks",
-        date: calendar.date(bySettingHour: 13, minute: 30, second: 0, of: now), priority: .high,
-        category: .work, isFlagged: true, hasReminder: true),
-      Task(
-        title: "Prepare for a meeting",
-        date: calendar.date(bySettingHour: 15, minute: 0, second: 0, of: now), priority: .medium,
-        category: .work, hasReminder: true),
-      Task(
-        title: "Groceries", date: calendar.date(bySettingHour: 21, minute: 30, second: 0, of: now),
-        priority: .low, category: .shopping, hasReminder: true),
-      Task(
-        title: "Wish SOUHAIL a Happy Birthday",
-        date: calendar.date(bySettingHour: 23, minute: 45, second: 0, of: now), priority: .high,
-        category: .personal, isFlagged: true, hasReminder: true),
-    ]
+  private func saveSettings() {
+      let settings = AppSettings(
+        visibleSmartLists: Array(visibleSmartLists),
+        visibleCategories: Array(visibleCategories),
+        smartListOrder: smartListOrder,
+        pinnedHomeSmartLists: Array(pinnedHomeSmartLists),
+        pinnedHomeCategoryIds: Array(pinnedHomeCategoryIds),
+        weekStartsOnMonday: weekStartsOnMonday
+      )
+      if let data = try? JSONEncoder().encode(settings) {
+          UserDefaults.standard.set(data, forKey: "AppSettings")
+      }
   }
 }

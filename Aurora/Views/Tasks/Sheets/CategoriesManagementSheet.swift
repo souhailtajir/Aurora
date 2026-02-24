@@ -76,8 +76,3 @@ struct CategoriesManagementSheet: View {
     }
   }
 }
-
-#Preview {
-  CategoriesManagementSheet()
-    .environment(TaskStore())
-}
