@@ -50,7 +50,7 @@ struct HomeView: View {
 
   private var flaggedCount: Int { taskStore.tasks.filter { $0.isFlagged && !$0.isCompleted }.count }
   private var workCount: Int {
-    taskStore.tasks.filter { $0.category == .work && !$0.isCompleted }.count
+    taskStore.tasks.filter { $0.category?.name == "Work" && !$0.isCompleted }.count
   }
 
   private func getCount(for listType: SmartListType) -> Int {
@@ -72,7 +72,7 @@ struct HomeView: View {
   }
 
   private func getCount(for category: TaskCategory) -> Int {
-    taskStore.tasks.filter { $0.category.id == category.id && !$0.isCompleted }.count
+    taskStore.tasks.filter { $0.category?.id == category.id && !$0.isCompleted }.count
   }
 
   private var pinnedCardsSection: some View {
