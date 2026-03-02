@@ -626,7 +626,7 @@ struct TaskSheet: View {
       title = task.title
       notes = task.notes
       url = task.url
-      selectedCategory = task.category
+      selectedCategory = task.category ?? .reminders
       selectedPriority = task.priority
       isFlagged = task.isFlagged
       isUrgent = task.priority == .high && task.hasReminder
