@@ -33,11 +33,11 @@ struct EditableTaskRow: View {
         }
       } label: {
         Circle()
-          .fill(task.isCompleted ? Color(hex: task.category.colorHex) : Color.clear)
+          .fill(task.isCompleted ? Color(hex: task.category?.colorHex ?? "808080") : Color.clear)
           .frame(width: 24, height: 24)
           .overlay(
             Circle()
-              .strokeBorder(Color(hex: task.category.colorHex), lineWidth: 2)
+              .strokeBorder(Color(hex: task.category?.colorHex ?? "808080"), lineWidth: 2)
           )
           .overlay {
             if task.isCompleted {
