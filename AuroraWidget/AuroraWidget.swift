@@ -102,21 +102,16 @@ struct AuroraWidgetEntryView: View {
   @Environment(\.widgetFamily) var family
   @Environment(\.colorScheme) var colorScheme
 
-  // MARK: Theme Colors (mirroring Theme.swift)
-
-  private var themePrimary: Color { Color(red: 0.4, green: 0.35, blue: 0.9) }
-  private var themeSecondary: Color { Color(red: 0.5, green: 0.4, blue: 0.95) }
-
   var body: some View {
     ZStack {
-      background
+      Theme.auroraBackground
 
       VStack(alignment: .leading, spacing: 0) {
         header
 
         if family == .systemLarge {
           progressBar
-            .padding(.bottom, 10)
+            .padding(.bottom, 12)
         }
 
         if entry.tasks.isEmpty {
@@ -130,48 +125,18 @@ struct AuroraWidgetEntryView: View {
     }
   }
 
-  // MARK: - Background
-
-  private var background: some View {
-    ZStack {
-      if colorScheme == .dark {
-        Color.black
-        LinearGradient(
-          colors: [
-            Color(red: 91 / 255, green: 80 / 255, blue: 160 / 255).opacity(0.4),
-            Color(red: 45 / 255, green: 27 / 255, blue: 105 / 255).opacity(0.2),
-            .clear,
-          ],
-          startPoint: .topLeading,
-          endPoint: .bottomTrailing
-        )
-      } else {
-        Color(red: 0.96, green: 0.95, blue: 0.98)
-        LinearGradient(
-          colors: [
-            Color(red: 232 / 255, green: 212 / 255, blue: 255 / 255).opacity(0.5),
-            Color(red: 212 / 255, green: 196 / 255, blue: 255 / 255).opacity(0.3),
-            .clear,
-          ],
-          startPoint: .topLeading,
-          endPoint: .bottomTrailing
-        )
-      }
-    }
-  }
-
   // MARK: - Header
 
   private var header: some View {
     HStack(alignment: .center) {
       VStack(alignment: .leading, spacing: 2) {
         Text(entry.date.formatted(.dateTime.weekday(.wide)))
-          .font(.headline.weight(.bold))
-          .foregroundStyle(themePrimary)
+          .font(.system(size: 18, weight: .bold, design: .rounded))
+          .foregroundStyle(Theme.primary)
 
         if family != .systemSmall {
           Text(entry.date.formatted(.dateTime.month(.abbreviated).day()))
-            .font(.caption2)
+            .font(.system(size: 12, weight: .medium, design: .rounded))
             .foregroundStyle(.secondary)
         }
       }
@@ -179,17 +144,19 @@ struct AuroraWidgetEntryView: View {
       Spacer()
 
       Text("\(entry.tasks.count)")
-        .font(.caption.weight(.bold))
-        .foregroundStyle(themePrimary)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
+        .font(.system(size: 13, weight: .bold, design: .rounded))
+        .foregroundStyle(.white)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
         .background(
-          Capsule().fill(themePrimary.opacity(0.15))
+          Capsule()
+            .fill(Theme.primary)
+            .shadow(color: Theme.primary.opacity(0.3), radius: 4, x: 0, y: 2)
         )
     }
     .padding(.horizontal, 16)
-    .padding(.top, 14)
-    .padding(.bottom, family == .systemSmall ? 8 : 10)
+    .padding(.top, 16)
+    .padding(.bottom, family == .systemSmall ? 8 : 12)
   }
 
   // MARK: - Progress Bar (Large only)
@@ -199,37 +166,38 @@ struct AuroraWidgetEntryView: View {
     let progress = CGFloat(entry.completedToday) / CGFloat(total)
     let percentage = entry.totalToday > 0 ? (entry.completedToday * 100) / entry.totalToday : 0
 
-    return VStack(alignment: .leading, spacing: 6) {
+    return VStack(alignment: .leading, spacing: 8) {
       HStack {
         Text("Daily Progress")
-          .font(.caption.weight(.medium))
+          .font(.system(size: 12, weight: .bold, design: .rounded))
           .foregroundStyle(.secondary)
         Spacer()
         Text("\(entry.completedToday)/\(entry.totalToday)")
-          .font(.caption.weight(.bold))
-          .foregroundStyle(themeSecondary)
+          .font(.system(size: 12, weight: .heavy, design: .rounded))
+          .foregroundStyle(Theme.secondary)
       }
 
       GeometryReader { geo in
         ZStack(alignment: .leading) {
           Capsule()
-            .fill(.gray.opacity(0.2))
-            .frame(height: 6)
+            .fill(.gray.opacity(0.15))
+            .frame(height: 8)
           Capsule()
             .fill(
               LinearGradient(
-                colors: [themePrimary, themeSecondary],
+                colors: [Theme.primary, Theme.secondary],
                 startPoint: .leading,
                 endPoint: .trailing
               )
             )
-            .frame(width: geo.size.width * progress, height: 6)
+            .frame(width: geo.size.width * progress, height: 8)
+            .shadow(color: Theme.primary.opacity(0.3), radius: 3, x: 0, y: 1)
         }
       }
-      .frame(height: 6)
+      .frame(height: 8)
 
       Text("\(percentage)% done")
-        .font(.caption2)
+        .font(.system(size: 10, weight: .medium, design: .rounded))
         .foregroundStyle(.tertiary)
     }
     .padding(.horizontal, 16)
@@ -238,19 +206,31 @@ struct AuroraWidgetEntryView: View {
   // MARK: - Empty State
 
   private var emptyState: some View {
-    VStack(spacing: 8) {
+    VStack(spacing: 12) {
       Spacer()
       Image(systemName: "checkmark.seal.fill")
-        .font(family == .systemSmall ? .title2 : .largeTitle)
-        .foregroundStyle(themePrimary)
+        .font(.system(size: family == .systemSmall ? 32 : 44))
+        .foregroundStyle(
+          LinearGradient(
+            colors: [Theme.primary, Theme.secondary],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+          )
+        )
         .symbolRenderingMode(.hierarchical)
-      Text("All Clear!")
-        .font(.subheadline.weight(.medium))
-        .foregroundStyle(.secondary)
-      if family != .systemSmall {
-        Text("No tasks remaining for today")
-          .font(.caption2)
-          .foregroundStyle(.tertiary)
+      
+      VStack(spacing: 4) {
+        // Updated wording for a more premium vibe
+        Text("Mission Accomplished")
+          .font(.system(size: 15, weight: .bold, design: .rounded))
+          .foregroundStyle(.primary.opacity(0.8))
+        
+        if family != .systemSmall {
+          Text("You've cleared your agenda for today")
+            .font(.system(size: 12, weight: .medium, design: .rounded))
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.center)
+        }
       }
       Spacer()
     }
@@ -268,10 +248,10 @@ struct AuroraWidgetEntryView: View {
       // Overflow indicator
       if entry.tasks.count > maxTasks {
         Text("+\(entry.tasks.count - maxTasks) more")
-          .font(.caption2.weight(.medium))
-          .foregroundStyle(.secondary)
+          .font(.system(size: 11, weight: .bold, design: .rounded))
+          .foregroundStyle(.secondary.opacity(0.8))
           .frame(maxWidth: .infinity, alignment: .center)
-          .padding(.top, 2)
+          .padding(.top, 4)
       }
     }
     .padding(.horizontal, 16)
@@ -282,53 +262,53 @@ struct AuroraWidgetEntryView: View {
   private func taskRow(_ task: AppTask) -> some View {
     let categoryColor = taskCategoryColor(task)
 
-    return HStack(alignment: .center, spacing: family == .systemSmall ? 8 : 10) {
+    return HStack(alignment: .center, spacing: family == .systemSmall ? 10 : 12) {
       // Toggle button
       Button(intent: ToggleTaskIntent(taskId: task.id.uuidString)) {
-        Circle()
-          .fill(task.isCompleted ? categoryColor : .clear)
-          .frame(width: family == .systemSmall ? 18 : 22, height: family == .systemSmall ? 18 : 22)
-          .overlay(
-            Circle()
-              .strokeBorder(categoryColor, lineWidth: 2)
-          )
-          .overlay {
-            if task.isCompleted {
-              Image(systemName: "checkmark")
-                .font(.system(size: family == .systemSmall ? 8 : 10, weight: .bold))
-                .foregroundStyle(.white)
-            }
+        ZStack {
+          Circle()
+            .strokeBorder(categoryColor, lineWidth: 2)
+            .background(Circle().fill(task.isCompleted ? categoryColor : .clear))
+            .frame(width: family == .systemSmall ? 20 : 24, height: family == .systemSmall ? 20 : 24)
+          
+          if task.isCompleted {
+            Image(systemName: "checkmark")
+              .font(.system(size: family == .systemSmall ? 9 : 11, weight: .bold))
+              .foregroundStyle(.white)
           }
+        }
       }
       .buttonStyle(.plain)
 
       // Task info
       VStack(alignment: .leading, spacing: 2) {
-        HStack(spacing: 4) {
+        HStack(spacing: 6) {
           // Priority dot
           if task.priority == .high {
             Circle()
               .fill(.red)
-              .frame(width: 6, height: 6)
+              .frame(width: 8, height: 8)
+              .shadow(color: .red.opacity(0.3), radius: 2)
           } else if task.priority == .medium {
             Circle()
               .fill(.orange)
-              .frame(width: 6, height: 6)
+              .frame(width: 8, height: 8)
+              .shadow(color: .orange.opacity(0.3), radius: 2)
           }
 
           Text(task.title)
-            .font(.system(size: family == .systemSmall ? 13 : 14, weight: .regular))
+            .font(.system(size: family == .systemSmall ? 14 : 15, weight: .medium, design: .rounded))
             .foregroundStyle(task.isCompleted ? .secondary : .primary)
             .lineLimit(1)
             .strikethrough(task.isCompleted)
         }
 
         if family != .systemSmall, let date = task.date, hasTimeComponent(date) {
-          HStack(spacing: 3) {
+          HStack(spacing: 4) {
             Image(systemName: "clock")
-              .font(.system(size: 9))
+              .font(.system(size: 10))
             Text(date.formatted(date: .omitted, time: .shortened))
-              .font(.system(size: 11))
+              .font(.system(size: 12, weight: .medium, design: .rounded))
           }
           .foregroundStyle(.secondary)
         }
@@ -339,21 +319,22 @@ struct AuroraWidgetEntryView: View {
       // Flag indicator
       if task.isFlagged {
         Image(systemName: "flag.fill")
-          .font(.system(size: family == .systemSmall ? 10 : 12))
+          .font(.system(size: family == .systemSmall ? 11 : 13))
           .foregroundStyle(.orange)
+          .shadow(color: .orange.opacity(0.2), radius: 2)
       }
     }
-    .padding(.horizontal, family == .systemSmall ? 8 : 12)
-    .padding(.vertical, family == .systemSmall ? 6 : 8)
+    .padding(.horizontal, 12)
+    .padding(.vertical, family == .systemSmall ? 8 : 10)
     .glassEffect(.regular)
-    .clipShape(RoundedRectangle(cornerRadius: 10))
+    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
   }
 
   // MARK: - Helpers
 
   private func taskCategoryColor(_ task: AppTask) -> Color {
     guard let hex = task.category?.colorHex else {
-      return themePrimary
+      return Theme.primary
     }
     return Color(hex: hex)
   }
