@@ -112,3 +112,22 @@ Thumbs.db
 *.sqlite
 *.realm
 *.db
+
+# =================================
+# Development Scratch Files & Secrets
+# =================================
+/build_log*.txt
+/add_file*.swift
+/add_theme*.rb
+/add_models*.rb
+/add_models*.swift
+/list_target_files.swift
+/list_target_files.rb
+/add_file_to_target.rb
+
+## ---- Xcode Result Bundles ----
+*.xcresult
+
+## ---- Gemini Agent Data ----
+.gemini/
+
