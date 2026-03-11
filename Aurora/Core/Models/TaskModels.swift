@@ -155,3 +155,6 @@ struct AppSettings: Codable {
     self.weekStartsOnMonday = weekStartsOnMonday
   }
 }
+
+/// An unambiguous alias for the `Task` model to avoid collisions with `Swift.Task` (concurrency) in environments like Widget extensions.
+typealias AppTask = Task

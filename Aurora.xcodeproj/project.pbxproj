@@ -6,6 +6,16 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		888888888881111111111111 /* Aurora/Core/Models/TaskModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 777777777771111111111111 /* Aurora/Core/Models/TaskModels.swift */; };
+		888888888882222222222222 /* Aurora/Core/Models/JournalModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 777777777772222222222222 /* Aurora/Core/Models/JournalModels.swift */; };
+		888888888883333333333333 /* Aurora/Core/Design/Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 777777777773333333333333 /* Aurora/Core/Design/Theme.swift */; };
+		888888888884444444444444 /* Aurora/Core/Models/SmartListType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 777777777774444444444444 /* Aurora/Core/Models/SmartListType.swift */; };
+		D2C9DAF12F61A8BD00867A47 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2C9DAF02F61A8BD00867A47 /* WidgetKit.framework */; };
+		D2C9DAF32F61A8BD00867A47 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2C9DAF22F61A8BD00867A47 /* SwiftUI.framework */; };
+		D2C9DB042F61A8BF00867A47 /* AuroraWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D2C9DAEE2F61A8BD00867A47 /* AuroraWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		D26D7C372EDE4C2200B0101A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,12 +31,40 @@
 			remoteGlobalIDString = D26D7C262EDE4C1D00B0101A;
 			remoteInfo = Aurora;
 		};
+		D2C9DB022F61A8BF00867A47 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D26D7C1F2EDE4C1D00B0101A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D2C9DAED2F61A8BD00867A47;
+			remoteInfo = AuroraWidgetExtension;
+		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		D2C9DB052F61A8BF00867A47 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				D2C9DB042F61A8BF00867A47 /* AuroraWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		777777777771111111111111 /* Aurora/Core/Models/TaskModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Aurora/Core/Models/TaskModels.swift; sourceTree = "<group>"; };
+		777777777772222222222222 /* Aurora/Core/Models/JournalModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Aurora/Core/Models/JournalModels.swift; sourceTree = "<group>"; };
+		777777777773333333333333 /* Aurora/Core/Design/Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Aurora/Core/Design/Theme.swift; sourceTree = "<group>"; };
+		777777777774444444444444 /* Aurora/Core/Models/SmartListType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Aurora/Core/Models/SmartListType.swift; sourceTree = "<group>"; };
 		D2560AA82EDE64A40004B219 /* Aurora.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Aurora.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2BD263F2EE086730008464D /* AuroraTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AuroraTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2BD26402EE086730008464D /* AuroraUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AuroraUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D2C9DAEE2F61A8BD00867A47 /* AuroraWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AuroraWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		D2C9DAF02F61A8BD00867A47 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		D2C9DAF22F61A8BD00867A47 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -36,6 +74,13 @@
 				Info.plist,
 			);
 			target = D26D7C262EDE4C1D00B0101A /* Aurora */;
+		};
+		D2C9DB092F61A8BF00867A47 /* Exceptions for "AuroraWidget" folder in "AuroraWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D2C9DAED2F61A8BD00867A47 /* AuroraWidgetExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -56,6 +101,14 @@
 		D26D7C432EDE4C2200B0101A /* AuroraUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = AuroraUITests;
+			sourceTree = "<group>";
+		};
+		D2C9DAF42F61A8BD00867A47 /* AuroraWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D2C9DB092F61A8BF00867A47 /* Exceptions for "AuroraWidget" folder in "AuroraWidgetExtension" target */,
+			);
+			path = AuroraWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -82,6 +135,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D2C9DAEB2F61A8BD00867A47 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D2C9DAF32F61A8BD00867A47 /* SwiftUI.framework in Frameworks */,
+				D2C9DAF12F61A8BD00867A47 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -94,7 +156,30 @@
 				D2560AA82EDE64A40004B219 /* Aurora.app */,
 				D2BD263F2EE086730008464D /* AuroraTests.xctest */,
 				D2BD26402EE086730008464D /* AuroraUITests.xctest */,
+				D2C9DAEE2F61A8BD00867A47 /* AuroraWidgetExtension.appex */,
+				D2C9DAF42F61A8BD00867A47 /* AuroraWidget */,
+				D2C9DAEF2F61A8BD00867A47 /* Frameworks */,
+				D2C9DD972F61B89E00867A47 /* Recovered References */,
 			);
+			sourceTree = "<group>";
+		};
+		D2C9DAEF2F61A8BD00867A47 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D2C9DAF02F61A8BD00867A47 /* WidgetKit.framework */,
+				D2C9DAF22F61A8BD00867A47 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D2C9DD972F61B89E00867A47 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				777777777771111111111111 /* Aurora/Core/Models/TaskModels.swift */,
+				777777777772222222222222 /* Aurora/Core/Models/JournalModels.swift */,
+				777777777773333333333333 /* Aurora/Core/Design/Theme.swift */,
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -107,17 +192,17 @@
 				D26D7C232EDE4C1D00B0101A /* Sources */,
 				D26D7C242EDE4C1D00B0101A /* Frameworks */,
 				D26D7C252EDE4C1D00B0101A /* Resources */,
+				D2C9DB052F61A8BF00867A47 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				D2C9DB032F61A8BF00867A47 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				D26D7C292EDE4C1D00B0101A /* Aurora */,
 			);
 			name = Aurora;
-			packageProductDependencies = (
-			);
 			productName = Aurora;
 			productReference = D2560AA82EDE64A40004B219 /* Aurora.app */;
 			productType = "com.apple.product-type.application";
@@ -139,8 +224,6 @@
 				D26D7C392EDE4C2200B0101A /* AuroraTests */,
 			);
 			name = AuroraTests;
-			packageProductDependencies = (
-			);
 			productName = AuroraTests;
 			productReference = D2BD263F2EE086730008464D /* AuroraTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -162,11 +245,29 @@
 				D26D7C432EDE4C2200B0101A /* AuroraUITests */,
 			);
 			name = AuroraUITests;
-			packageProductDependencies = (
-			);
 			productName = AuroraUITests;
 			productReference = D2BD26402EE086730008464D /* AuroraUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		D2C9DAED2F61A8BD00867A47 /* AuroraWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D2C9DB082F61A8BF00867A47 /* Build configuration list for PBXNativeTarget "AuroraWidgetExtension" */;
+			buildPhases = (
+				D2C9DAEA2F61A8BD00867A47 /* Sources */,
+				D2C9DAEB2F61A8BD00867A47 /* Frameworks */,
+				D2C9DAEC2F61A8BD00867A47 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				D2C9DAF42F61A8BD00867A47 /* AuroraWidget */,
+			);
+			name = AuroraWidgetExtension;
+			productName = AuroraWidgetExtension;
+			productReference = D2C9DAEE2F61A8BD00867A47 /* AuroraWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -189,6 +290,9 @@
 						CreatedOnToolsVersion = 26.1.1;
 						TestTargetID = D26D7C262EDE4C1D00B0101A;
 					};
+					D2C9DAED2F61A8BD00867A47 = {
+						CreatedOnToolsVersion = 26.1.1;
+					};
 				};
 			};
 			buildConfigurationList = D26D7C222EDE4C1D00B0101A /* Build configuration list for PBXProject "Aurora" */;
@@ -208,6 +312,7 @@
 				D26D7C262EDE4C1D00B0101A /* Aurora */,
 				D26D7C352EDE4C2200B0101A /* AuroraTests */,
 				D26D7C3F2EDE4C2200B0101A /* AuroraUITests */,
+				D2C9DAED2F61A8BD00867A47 /* AuroraWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -228,6 +333,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		D26D7C3E2EDE4C2200B0101A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D2C9DAEC2F61A8BD00867A47 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -258,6 +370,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D2C9DAEA2F61A8BD00867A47 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				888888888881111111111111 /* Aurora/Core/Models/TaskModels.swift in Sources */,
+				888888888882222222222222 /* Aurora/Core/Models/JournalModels.swift in Sources */,
+				888888888883333333333333 /* Aurora/Core/Design/Theme.swift in Sources */,
+				888888888884444444444444 /* Aurora/Core/Models/SmartListType.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -270,6 +393,11 @@
 			isa = PBXTargetDependency;
 			target = D26D7C262EDE4C1D00B0101A /* Aurora */;
 			targetProxy = D26D7C412EDE4C2200B0101A /* PBXContainerItemProxy */;
+		};
+		D2C9DB032F61A8BF00867A47 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D2C9DAED2F61A8BD00867A47 /* AuroraWidgetExtension */;
+			targetProxy = D2C9DB022F61A8BF00867A47 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -565,6 +693,66 @@
 			};
 			name = Release;
 		};
+		D2C9DB062F61A8BF00867A47 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = RP6JRXYV7V;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AuroraWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = AuroraWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = souhailtajir.Aurora.AuroraWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D2C9DB072F61A8BF00867A47 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = RP6JRXYV7V;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AuroraWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = AuroraWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = souhailtajir.Aurora.AuroraWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -600,6 +788,15 @@
 			buildConfigurations = (
 				D26D7C512EDE4C2200B0101A /* Debug */,
 				D26D7C522EDE4C2200B0101A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D2C9DB082F61A8BF00867A47 /* Build configuration list for PBXNativeTarget "AuroraWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D2C9DB062F61A8BF00867A47 /* Debug */,
+				D2C9DB072F61A8BF00867A47 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
