@@ -7,6 +7,7 @@ A beautiful iOS productivity app built with SwiftUI for iOS 26+, featuring liqui
 - **Task Management** — Create, organize, and track tasks with categories, priorities, and due dates
 - **Journal** — Personal journaling with mood tracking and rich text support
 - **Calendar** — Visual calendar integration for planning and scheduling
+- **Widgets** — Home screen visibility for your most important tasks and entries
 - **Smart Lists** — Intelligent task filtering (Today, Scheduled, Flagged, etc.)
 - **Customization** — Personalize your experience with themes and layouts
 
@@ -41,12 +42,13 @@ Aurora follows a modern SwiftUI architecture with:
 ```
 Aurora/
 ├── Aurora/                 # Main app source
-│   ├── Views/             # SwiftUI views
-│   ├── Models/            # Data models
-│   ├── Stores/            # State management
-│   └── Components/        # Reusable UI components
-├── AuroraTests/           # Unit tests
-└── AuroraUITests/         # UI tests
+│   ├── App/               # App entry point and configuration
+│   ├── Core/              # Business logic, models, and shared utilities
+│   ├── Views/             # SwiftUI views organized by feature
+│   └── Assets.xcassets/   # Image and color assets
+├── AuroraWidget/           # Home screen widget extension
+├── AuroraTests/            # Unit tests
+└── AuroraUITests/          # UI tests
 ```
 
 ## License
