@@ -63,6 +63,7 @@ Thumbs.db
 
 ## ---- IDE & Editor ----
 .idea/
+.vscode/
 *.hmap
 *.ipa
 *.dSYM.zip
@@ -124,6 +125,7 @@ Thumbs.db
 /list_target_files.swift
 /list_target_files.rb
 /add_file_to_target.rb
+/project.pbxproj
 
 ## ---- Xcode Result Bundles ----
 *.xcresult

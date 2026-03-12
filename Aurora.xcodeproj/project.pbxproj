@@ -14,6 +14,8 @@
 		D2C9DAF12F61A8BD00867A47 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2C9DAF02F61A8BD00867A47 /* WidgetKit.framework */; };
 		D2C9DAF32F61A8BD00867A47 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2C9DAF22F61A8BD00867A47 /* SwiftUI.framework */; };
 		D2C9DB042F61A8BF00867A47 /* AuroraWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D2C9DAEE2F61A8BD00867A47 /* AuroraWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B1B1B1B1B1B1B1B1B1B1B1B1 /* Aurora/Core/Utilities/ModelContainerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A1A1A1A1A1A1A1A1A1A1A1 /* Aurora/Core/Utilities/ModelContainerHelper.swift */; };
+
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +67,8 @@
 		D2C9DAEE2F61A8BD00867A47 /* AuroraWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AuroraWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2C9DAF02F61A8BD00867A47 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		D2C9DAF22F61A8BD00867A47 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		A1A1A1A1A1A1A1A1A1A1A1A1 /* Aurora/Core/Utilities/ModelContainerHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Aurora/Core/Utilities/ModelContainerHelper.swift; sourceTree = "<group>"; };
+
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -178,8 +182,10 @@
 				777777777771111111111111 /* Aurora/Core/Models/TaskModels.swift */,
 				777777777772222222222222 /* Aurora/Core/Models/JournalModels.swift */,
 				777777777773333333333333 /* Aurora/Core/Design/Theme.swift */,
+				A1A1A1A1A1A1A1A1A1A1A1A1 /* Aurora/Core/Utilities/ModelContainerHelper.swift */,
 			);
 			name = "Recovered References";
+
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -378,8 +384,10 @@
 				888888888882222222222222 /* Aurora/Core/Models/JournalModels.swift in Sources */,
 				888888888883333333333333 /* Aurora/Core/Design/Theme.swift in Sources */,
 				888888888884444444444444 /* Aurora/Core/Models/SmartListType.swift in Sources */,
+				B1B1B1B1B1B1B1B1B1B1B1B1 /* Aurora/Core/Utilities/ModelContainerHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
+
 		};
 /* End PBXSourcesBuildPhase section */
 
