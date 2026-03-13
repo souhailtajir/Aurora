@@ -254,9 +254,9 @@ struct TodayAgendaView: View {
                             .shadow(color: Theme.primary.opacity(0.4), radius: 8, x: 0, y: 4)
                     }
                 }
-                .padding(.horizontal, family == .systemSmall ? 16 : 22)
-                .padding(.top, family == .systemSmall ? 18 : 24)
-                .padding(.bottom, family == .systemSmall ? 10 : 16)
+                .padding(.horizontal, family == .systemSmall ? 14 : 18)
+                .padding(.top, family == .systemSmall ? 14 : 18)
+                .padding(.bottom, family == .systemSmall ? 8 : 12)
 
                 // ── Progress bar (medium / large) ──
                 if family != .systemSmall {
@@ -290,9 +290,9 @@ struct TodayAgendaView: View {
                                     .padding(.horizontal, 2)
                             }
                         }
-                        .frame(height: 10)
+                        .frame(height: 8)
                     }
-                    .padding(.horizontal, 22).padding(.bottom, 18)
+                    .padding(.horizontal, family == .systemSmall ? 14 : 18).padding(.bottom, 14)
                 }
 
                 // ── Tasks or empty ──
@@ -328,7 +328,9 @@ struct TodayAgendaView: View {
 
     private var emptyState: some View {
         VStack(spacing: family == .systemSmall ? 8 : 14) {
-            Spacer(minLength: 0)
+            if family == .systemSmall || family == .systemLarge { Spacer(minLength: 0) }
+            else if family == .systemMedium && !entry.pendingTodayTasks.isEmpty { Spacer(minLength: 0) }
+            else { Spacer() }
             ZStack {
                 Circle().fill(Theme.primary.opacity(0.12))
                 Circle()
@@ -545,12 +547,12 @@ struct TasksByPriorityView: View {
                         Text("done")
                             .font(.system(size: 9, weight: .bold, design: .rounded)).foregroundStyle(.secondary)
                     }
-                    .padding(.horizontal, 14).padding(.vertical, 8)
+                    .padding(.horizontal, 12).padding(.vertical, 6)
                     .glassCard()
                 }
-                .padding(.horizontal, family == .systemSmall ? 16 : 22)
-                .padding(.top, family == .systemSmall ? 18 : 24)
-                .padding(.bottom, family == .systemSmall ? 10 : 16)
+                .padding(.horizontal, family == .systemSmall ? 14 : 18)
+                .padding(.top, family == .systemSmall ? 14 : 18)
+                .padding(.bottom, family == .systemSmall ? 8 : 12)
 
                 VStack(spacing: 8) {
                     priorityRow("High Priority",  highCount,   Color(red: 0.96, green: 0.34, blue: 0.40), "exclamationmark.circle.fill")
