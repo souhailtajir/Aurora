@@ -31,14 +31,29 @@ private struct AuroraBackground: View {
         ZStack {
             (scheme == .dark ? Color(hex: "0C0A14") : Color(hex: "F8F7FB"))
                 .ignoresSafeArea()
+            
+            // Primary Glow
+            MeshGradient(width: 3, height: 3, points: [
+                [0, 0], [0.5, 0], [1, 0],
+                [0, 0.5], [0.5, 0.5], [1, 0.5],
+                [0, 1], [0.5, 1], [1, 1]
+            ], colors: [
+                Theme.primary.opacity(0.1), Theme.primary.opacity(0.2), Theme.secondary.opacity(0.1),
+                Theme.secondary.opacity(0.15), Theme.primary.opacity(0.1), Theme.secondary.opacity(0.2),
+                Theme.primary.opacity(0.2), Theme.secondary.opacity(0.1), Theme.primary.opacity(0.1)
+            ])
+            .ignoresSafeArea()
+            .blur(radius: 60)
+            
+            // Accents
             Circle()
-                .fill(Theme.primary.opacity(0.15))
-                .blur(radius: 40)
-                .offset(x: -80, y: -60)
+                .fill(Theme.primary.opacity(0.12))
+                .blur(radius: 45)
+                .offset(x: -60, y: -40)
             Circle()
-                .fill(Theme.secondary.opacity(0.12))
-                .blur(radius: 50)
-                .offset(x: 100, y: 80)
+                .fill(Theme.secondary.opacity(0.1))
+                .blur(radius: 55)
+                .offset(x: 80, y: 60)
         }
     }
 }
@@ -50,13 +65,24 @@ private struct GlassCard: ViewModifier {
     func body(content: Content) -> some View {
         content
             .background {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(.white.opacity(scheme == .dark ? 0.04 : 0.45))
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(.white.opacity(scheme == .dark ? 0.05 : 0.5))
                     .glassEffect(.clear)
+                    .shadow(color: .black.opacity(scheme == .dark ? 0.15 : 0.05), radius: 10, x: 0, y: 4)
             }
             .overlay {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .strokeBorder(.white.opacity(scheme == .dark ? 0.07 : 0.25), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [
+                                .white.opacity(scheme == .dark ? 0.12 : 0.4),
+                                .white.opacity(scheme == .dark ? 0.04 : 0.15)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
+                    )
             }
     }
 }
@@ -197,52 +223,46 @@ struct TodayAgendaView: View {
     }
 
     var body: some View {
-        ZStack {
-            AuroraBackground()
-
-            // Status bar vignette
-            VStack {
-                LinearGradient(
-                    colors: [.black.opacity(scheme == .dark ? 0.3 : 0.1), .clear],
-                    startPoint: .top, endPoint: .bottom)
-                .frame(height: family == .systemSmall ? 40 : 56)
-                Spacer()
-            }
-
-            VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
 
                 // ── Header ──
-                HStack(alignment: .center) {
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(entry.date.formatted(.dateTime.weekday(.wide)))
-                            .font(.system(size: 20, weight: .black, design: .rounded))
+                HStack(alignment: .firstTextBaseline) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(entry.date.formatted(.dateTime.weekday(family == .systemSmall ? .abbreviated : .wide)))
+                            .font(.system(size: family == .systemSmall ? 18 : 22, weight: .black, design: .rounded))
                             .foregroundStyle(LinearGradient(
                                 colors: [Theme.primary, Theme.secondary],
-                                startPoint: .leading, endPoint: .trailing))
+                                startPoint: .topLeading, endPoint: .bottomTrailing))
                         if family != .systemSmall {
                             Text(entry.date.formatted(.dateTime.month(.wide).day()))
-                                .font(.system(size: 13, weight: .bold, design: .rounded))
-                                .foregroundStyle(.secondary.opacity(0.7))
+                                .font(.system(size: 14, weight: .bold, design: .rounded))
+                                .foregroundStyle(.secondary.opacity(0.6))
                         }
                     }
                     Spacer()
-                    Text("\(entry.pendingTodayTasks.count)")
-                        .font(.system(size: 14, weight: .black, design: .rounded))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 12).padding(.vertical, 6)
-                        .background {
-                            Capsule()
-                                .fill(Theme.primary)
-                                .shadow(color: Theme.primary.opacity(0.4), radius: 8, x: 0, y: 4)
-                        }
+                    HStack(spacing: 4) {
+                        Image(systemName: "checklist")
+                            .font(.system(size: 12, weight: .bold))
+                        Text("\(entry.pendingTodayTasks.count)")
+                            .font(.system(size: 14, weight: .black, design: .rounded))
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12).padding(.vertical, 6)
+                    .background {
+                        Capsule()
+                            .fill(LinearGradient(colors: [Theme.primary, Theme.secondary], startPoint: .topLeading, endPoint: .bottomTrailing))
+                            .shadow(color: Theme.primary.opacity(0.4), radius: 8, x: 0, y: 4)
+                    }
                 }
-                .padding(.horizontal, 20).padding(.top, 20).padding(.bottom, 14)
+                .padding(.horizontal, family == .systemSmall ? 14 : 18)
+                .padding(.top, family == .systemSmall ? 14 : 18)
+                .padding(.bottom, family == .systemSmall ? 8 : 12)
 
                 // ── Progress bar (medium / large) ──
                 if family != .systemSmall {
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 10) {
                         HStack {
-                            Label("Daily Goal", systemImage: "sparkles")
+                            Label("Day Progress", systemImage: "sparkles")
                                 .font(.system(size: 11, weight: .bold, design: .rounded))
                                 .foregroundStyle(.secondary)
                             Spacer()
@@ -253,20 +273,26 @@ struct TodayAgendaView: View {
                         GeometryReader { g in
                             ZStack(alignment: .leading) {
                                 Capsule()
-                                    .fill(.white.opacity(scheme == .dark ? 0.05 : 0.3))
-                                    .frame(height: 8)
-                                    .glassEffect(.clear)
+                                    .fill(.white.opacity(scheme == .dark ? 0.08 : 0.2))
+                                    .frame(height: 10)
                                 Capsule()
                                     .fill(LinearGradient(
                                         colors: [Theme.primary, Theme.secondary],
                                         startPoint: .leading, endPoint: .trailing))
-                                    .frame(width: max(0, g.size.width * progress), height: 8)
-                                    .shadow(color: Theme.primary.opacity(0.5), radius: 4)
+                                    .frame(width: max(10, g.size.width * progress), height: 10)
+                                    .shadow(color: Theme.primary.opacity(0.5), radius: 6)
+                                
+                                // Glisten effect
+                                Capsule()
+                                    .fill(LinearGradient(colors: [.white.opacity(0.4), .clear], startPoint: .top, endPoint: .center))
+                                    .frame(width: max(10, g.size.width * progress), height: 4)
+                                    .padding(.top, 1)
+                                    .padding(.horizontal, 2)
                             }
                         }
                         .frame(height: 8)
                     }
-                    .padding(.horizontal, 20).padding(.bottom, 14)
+                    .padding(.horizontal, family == .systemSmall ? 14 : 18).padding(.bottom, 14)
                 }
 
                 // ── Tasks or empty ──
@@ -288,100 +314,118 @@ struct TodayAgendaView: View {
                             .padding(.horizontal, 20).padding(.top, 2)
                         }
                     }
-                    .padding(.horizontal, 14)
+                    .padding(.horizontal, family == .systemSmall ? 10 : 14)
+                    Spacer(minLength: 0)
                 }
 
-                Spacer(minLength: 0)
             }
+            .widgetURL(URL(string: "aurora://today"))
         }
-        .widgetURL(URL(string: "aurora://today"))
-    }
 
     private var maxVisible: Int {
         switch family { case .systemSmall: return 2; case .systemLarge: return 6; default: return 3 }
     }
 
     private var emptyState: some View {
-        VStack(spacing: 14) {
-            Spacer()
+        VStack(spacing: family == .systemSmall ? 8 : 14) {
+            if family == .systemSmall || family == .systemLarge { Spacer(minLength: 0) }
+            else if family == .systemMedium && !entry.pendingTodayTasks.isEmpty { Spacer(minLength: 0) }
+            else { Spacer() }
             ZStack {
-                Circle().fill(Theme.primary.opacity(0.12)).frame(width: 72, height: 72)
+                Circle().fill(Theme.primary.opacity(0.12))
                 Circle()
                     .strokeBorder(LinearGradient(colors: [Theme.primary, Theme.secondary],
                                                  startPoint: .top, endPoint: .bottom), lineWidth: 2)
-                    .frame(width: 72, height: 72)
                 Image(systemName: "star.fill")
-                    .font(.system(size: 34))
+                    .font(.system(size: family == .systemSmall ? 28 : 34))
                     .foregroundStyle(LinearGradient(colors: [Theme.primary, Theme.secondary],
                                                    startPoint: .top, endPoint: .bottom))
                 Image(systemName: "checkmark")
-                    .font(.system(size: 16, weight: .black))
+                    .font(.system(size: family == .systemSmall ? 12 : 16, weight: .black))
                     .foregroundStyle(.white).offset(y: 2)
             }
+            .frame(width: family == .systemSmall ? 56 : 72, height: family == .systemSmall ? 56 : 72)
             .shadow(color: Theme.primary.opacity(0.3), radius: 12)
-            VStack(spacing: 4) {
+            
+            VStack(spacing: family == .systemSmall ? 2 : 4) {
                 Text("Mission Accomplished")
-                    .font(.system(size: 15, weight: .black, design: .rounded)).foregroundStyle(.primary)
+                    .font(.system(size: family == .systemSmall ? 13 : 15, weight: .black, design: .rounded)).foregroundStyle(.primary)
                 Text("All clear for takeoff.")
-                    .font(.system(size: 12, weight: .bold, design: .rounded)).foregroundStyle(.secondary)
+                    .font(.system(size: family == .systemSmall ? 10 : 12, weight: .bold, design: .rounded)).foregroundStyle(.secondary)
             }
-            Spacer()
+            Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity)
     }
 
     private func taskRow(_ task: AppTask) -> some View {
         let catColor = task.category.map { Color(hex: $0.colorHex) } ?? Theme.primary
-        return HStack(spacing: 12) {
+        return HStack(spacing: 14) {
             Button(intent: ToggleTaskIntent(taskId: task.id.uuidString)) {
                 ZStack {
                     Circle()
-                        .strokeBorder(task.isCompleted ? catColor : .primary.opacity(0.15), lineWidth: 2)
-                        .background(Circle().fill(task.isCompleted
-                            ? catColor : .white.opacity(scheme == .dark ? 0.05 : 0.8)))
-                        .frame(width: 22, height: 22)
-                        .shadow(color: task.isCompleted ? catColor.opacity(0.4) : .clear, radius: 4)
+                        .strokeBorder(task.isCompleted ? catColor : .primary.opacity(0.2), lineWidth: 2)
+                        .background(
+                            Circle()
+                                .fill(task.isCompleted ? catColor : .white.opacity(scheme == .dark ? 0.08 : 0.6))
+                        )
+                        .frame(width: 24, height: 24)
+                        .shadow(color: task.isCompleted ? catColor.opacity(0.4) : .clear, radius: 5)
+                    
                     if task.isCompleted {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 10, weight: .black)).foregroundStyle(.white)
+                            .font(.system(size: 11, weight: .black))
+                            .foregroundStyle(.white)
                     }
                 }
             }
             .buttonStyle(.plain)
 
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 6) {
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: 8) {
                     if task.priority == .high {
-                        Capsule().fill(.red).frame(width: 3, height: 14)
-                            .shadow(color: .red.opacity(0.5), radius: 3)
+                        Image(systemName: "exclamationmark.circle.fill")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.red)
                     } else if task.priority == .medium {
-                        Capsule().fill(.orange).frame(width: 3, height: 14)
-                            .shadow(color: .orange.opacity(0.5), radius: 3)
+                        Image(systemName: "minus.circle.fill")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.orange)
                     }
+                    
                     Text(task.title)
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .font(.system(size: 15, weight: .bold, design: .rounded))
                         .foregroundStyle(task.isCompleted ? .secondary : .primary)
-                        .strikethrough(task.isCompleted).lineLimit(1)
+                        .strikethrough(task.isCompleted)
+                        .lineLimit(1)
                 }
+                
                 if family != .systemSmall,
                    let date = task.date,
                    Calendar.current.component(.hour, from: date) != 0 {
-                    HStack(spacing: 3) {
-                        Image(systemName: "clock.fill").font(.system(size: 9))
+                    HStack(spacing: 4) {
+                        Image(systemName: "clock.fill").font(.system(size: 10))
                         Text(date.formatted(date: .omitted, time: .shortened))
-                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                            .font(.system(size: 12, weight: .bold, design: .rounded))
                     }
-                    .foregroundStyle(.secondary.opacity(0.7))
+                    .foregroundStyle(.secondary.opacity(0.6))
                 }
             }
+            
             Spacer(minLength: 0)
+            
             if task.isFlagged {
-                Image(systemName: "flag.fill").font(.system(size: 11)).foregroundStyle(.orange)
-                    .padding(5)
-                    .background { Circle().fill(.orange.opacity(0.1)).glassEffect(.clear) }
+                Image(systemName: "flag.fill")
+                    .font(.system(size: 12))
+                    .foregroundStyle(.orange)
+                    .padding(6)
+                    .background {
+                        Circle()
+                            .fill(.orange.opacity(0.12))
+                    }
             }
         }
-        .padding(.horizontal, 12).padding(.vertical, 10)
+        .padding(.horizontal, 14).padding(.vertical, 12)
         .glassCard()
     }
 }
@@ -398,68 +442,69 @@ struct TodayPulseView: View {
     }
 
     var body: some View {
-        ZStack {
-            AuroraBackground()
-            VStack(spacing: 0) {
-                HStack {
-                    Text(entry.date.formatted(.dateTime.weekday(.abbreviated)).uppercased())
-                        .font(.system(size: 10, weight: .black, design: .rounded))
-                        .foregroundStyle(Theme.primary)
-                    Spacer()
-                    if entry.longestStreak > 0 {
-                        HStack(spacing: 2) {
-                            Image(systemName: "flame.fill").font(.system(size: 11)).foregroundStyle(.orange)
-                            Text("\(entry.longestStreak)")
-                                .font(.system(size: 11, weight: .black, design: .rounded)).foregroundStyle(.orange)
-                        }
+        VStack(spacing: 0) {
+            HStack {
+                Text(entry.date.formatted(.dateTime.weekday(.abbreviated)).uppercased())
+                    .font(.system(size: 10, weight: .black, design: .rounded))
+                    .foregroundStyle(Theme.primary)
+                Spacer()
+                if entry.longestStreak > 0 {
+                    HStack(spacing: 2) {
+                        Image(systemName: "flame.fill").font(.system(size: 11)).foregroundStyle(.orange)
+                        Text("\(entry.longestStreak)")
+                            .font(.system(size: 11, weight: .black, design: .rounded)).foregroundStyle(.orange)
                     }
                 }
-                .padding(.horizontal, 14).padding(.top, 14)
-
-                Spacer(minLength: 6)
-
-                ZStack {
-                    Circle()
-                        .stroke(.white.opacity(scheme == .dark ? 0.07 : 0.2), lineWidth: 7)
-                    Circle()
-                        .trim(from: 0, to: progress)
-                        .stroke(LinearGradient(colors: [Theme.primary, Theme.secondary],
-                                               startPoint: .leading, endPoint: .trailing),
-                                style: StrokeStyle(lineWidth: 7, lineCap: .round))
-                        .rotationEffect(.degrees(-90))
-                    VStack(spacing: 1) {
-                        Text("\(entry.completedToday)")
-                            .font(.system(size: 20, weight: .black, design: .rounded)).foregroundStyle(.primary)
-                        Text("/ \(entry.totalToday)")
-                            .font(.system(size: 10, weight: .bold, design: .rounded)).foregroundStyle(.secondary)
-                    }
-                }
-                .frame(width: 64, height: 64).frame(maxWidth: .infinity)
-
-                Spacer(minLength: 8)
-
-                if let task = entry.pendingTodayTasks.first {
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("NEXT")
-                            .font(.system(size: 9, weight: .black, design: .rounded))
-                            .foregroundStyle(Theme.primary.opacity(0.8))
-                        Text(task.title)
-                            .font(.system(size: 12, weight: .bold, design: .rounded))
-                            .foregroundStyle(.primary).lineLimit(2)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 10).padding(.vertical, 8)
-                    .glassCard()
-                    .padding(.horizontal, 10)
-                } else {
-                    Text("All clear! 🎉")
-                        .font(.system(size: 12, weight: .black, design: .rounded))
-                        .foregroundStyle(LinearGradient(colors: [Theme.primary, Theme.secondary],
-                                                        startPoint: .leading, endPoint: .trailing))
-                        .frame(maxWidth: .infinity)
-                }
-                Spacer(minLength: 12)
             }
+            .padding(.horizontal, 14).padding(.top, 14)
+
+            Spacer(minLength: 6)
+
+            ZStack {
+                Circle()
+                    .stroke(.white.opacity(scheme == .dark ? 0.08 : 0.2), lineWidth: 8)
+                Circle()
+                    .trim(from: 0, to: progress)
+                    .stroke(LinearGradient(colors: [Theme.primary, Theme.secondary],
+                                           startPoint: .topLeading, endPoint: .bottomTrailing),
+                            style: StrokeStyle(lineWidth: 8, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                    .shadow(color: Theme.primary.opacity(0.4), radius: 6)
+                
+                VStack(spacing: 0) {
+                    Text("\(entry.completedToday)")
+                        .font(.system(size: 22, weight: .black, design: .rounded))
+                        .foregroundStyle(.primary)
+                    Text("/ \(entry.totalToday)")
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .foregroundStyle(.secondary.opacity(0.8))
+                }
+            }
+            .frame(width: 68, height: 68).frame(maxWidth: .infinity)
+
+            Spacer(minLength: 8)
+
+            if let task = entry.pendingTodayTasks.first {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("NEXT")
+                        .font(.system(size: 9, weight: .black, design: .rounded))
+                        .foregroundStyle(Theme.primary.opacity(0.8))
+                    Text(task.title)
+                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                        .foregroundStyle(.primary).lineLimit(2)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 10).padding(.vertical, 8)
+                .glassCard()
+                .padding(.horizontal, 10)
+            } else {
+                Text("All clear! 🎉")
+                    .font(.system(size: 12, weight: .black, design: .rounded))
+                    .foregroundStyle(LinearGradient(colors: [Theme.primary, Theme.secondary],
+                                                    startPoint: .leading, endPoint: .trailing))
+                    .frame(maxWidth: .infinity)
+            }
+            Spacer(minLength: 12)
         }
         .widgetURL(URL(string: "aurora://today"))
     }
@@ -480,9 +525,7 @@ struct TasksByPriorityView: View {
     private var lowCount:    Int { entry.allPendingTasks.filter { $0.priority == .low }.count }
 
     var body: some View {
-        ZStack {
-            AuroraBackground()
-            VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
 
                 HStack {
                     VStack(alignment: .leading, spacing: 1) {
@@ -504,10 +547,12 @@ struct TasksByPriorityView: View {
                         Text("done")
                             .font(.system(size: 9, weight: .bold, design: .rounded)).foregroundStyle(.secondary)
                     }
-                    .padding(.horizontal, 14).padding(.vertical, 8)
+                    .padding(.horizontal, 12).padding(.vertical, 6)
                     .glassCard()
                 }
-                .padding(.horizontal, 18).padding(.top, 18).padding(.bottom, 14)
+                .padding(.horizontal, family == .systemSmall ? 14 : 18)
+                .padding(.top, family == .systemSmall ? 14 : 18)
+                .padding(.bottom, family == .systemSmall ? 8 : 12)
 
                 VStack(spacing: 8) {
                     priorityRow("High Priority",  highCount,   Color(red: 0.96, green: 0.34, blue: 0.40), "exclamationmark.circle.fill")
@@ -528,7 +573,6 @@ struct TasksByPriorityView: View {
                 }
                 Spacer(minLength: 0)
             }
-        }
         .widgetURL(URL(string: "aurora://tasks"))
     }
 
@@ -575,49 +619,50 @@ struct CategoryRingView: View {
     }
 
     var body: some View {
-        ZStack {
-            AuroraBackground()
-            VStack(spacing: 0) {
-                HStack {
-                    Image(systemName: "square.grid.2x2.fill").font(.system(size: 11))
-                        .foregroundStyle(Theme.primary)
-                    Text("TASKS")
-                        .font(.system(size: 9, weight: .black, design: .rounded)).foregroundStyle(.secondary)
-                    Spacer()
-                }
-                .padding(.horizontal, 14).padding(.top, 14)
-
-                Spacer(minLength: 8)
-
-                ZStack {
-                    Circle().stroke(.white.opacity(scheme == .dark ? 0.07 : 0.2), lineWidth: 9)
-                    Circle()
-                        .trim(from: 0, to: progress)
-                        .stroke(LinearGradient(colors: [Theme.primary, Theme.secondary],
-                                               startPoint: .topLeading, endPoint: .bottomTrailing),
-                                style: StrokeStyle(lineWidth: 9, lineCap: .round))
-                        .rotationEffect(.degrees(-90))
-                        .shadow(color: Theme.primary.opacity(0.4), radius: 6)
-                    VStack(spacing: 0) {
-                        Text("\(Int(progress * 100))%")
-                            .font(.system(size: 18, weight: .black, design: .rounded)).foregroundStyle(.primary)
-                        Text("today")
-                            .font(.system(size: 9, weight: .bold, design: .rounded)).foregroundStyle(.secondary)
-                    }
-                }
-                .frame(width: 70, height: 70).frame(maxWidth: .infinity)
-
-                Spacer(minLength: 10)
-
-                HStack {
-                    miniStat("\(entry.completedToday)", "done")
-                    Divider().frame(height: 22).background(.white.opacity(0.1))
-                    miniStat("\(max(0, entry.totalToday - entry.completedToday))", "left")
-                }
-                .frame(maxWidth: .infinity)
-
-                Spacer(minLength: 12)
+        VStack(spacing: 0) {
+            HStack {
+                Image(systemName: "square.grid.2x2.fill").font(.system(size: 11))
+                    .foregroundStyle(Theme.primary)
+                Text("TASKS")
+                    .font(.system(size: 9, weight: .black, design: .rounded)).foregroundStyle(.secondary)
+                Spacer()
             }
+            .padding(.horizontal, 14).padding(.top, 14)
+
+            Spacer(minLength: 8)
+
+            ZStack {
+                Circle()
+                    .stroke(.white.opacity(scheme == .dark ? 0.08 : 0.2), lineWidth: 10)
+                Circle()
+                    .trim(from: 0, to: progress)
+                    .stroke(LinearGradient(colors: [Theme.primary, Theme.secondary],
+                                           startPoint: .topLeading, endPoint: .bottomTrailing),
+                            style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                    .shadow(color: Theme.primary.opacity(0.4), radius: 8)
+                
+                VStack(spacing: 0) {
+                    Text("\(Int(progress * 100))%")
+                        .font(.system(size: 20, weight: .black, design: .rounded))
+                        .foregroundStyle(.primary)
+                    Text("today")
+                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .foregroundStyle(.secondary.opacity(0.8))
+                }
+            }
+            .frame(width: 74, height: 74).frame(maxWidth: .infinity)
+
+            Spacer(minLength: 10)
+
+            HStack {
+                miniStat("\(entry.completedToday)", "done")
+                Divider().frame(height: 22).background(.white.opacity(0.1))
+                miniStat("\(max(0, entry.totalToday - entry.completedToday))", "left")
+            }
+            .frame(maxWidth: .infinity)
+
+            Spacer(minLength: 12)
         }
         .widgetURL(URL(string: "aurora://tasks"))
     }
@@ -646,83 +691,81 @@ struct JournalPreviewView: View {
     @Environment(\.widgetFamily) private var family
 
     var body: some View {
-        ZStack {
-            AuroraBackground()
-            VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
 
-                HStack {
-                    VStack(alignment: .leading, spacing: 1) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "book.closed.fill").font(.system(size: 12))
-                                .foregroundStyle(Theme.secondary)
-                            Text("Journal")
-                                .font(.system(size: 18, weight: .black, design: .rounded)).foregroundStyle(.primary)
-                        }
-                        Text(entry.date.formatted(.dateTime.month(.abbreviated).day(.defaultDigits)))
+            HStack {
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "book.closed.fill").font(.system(size: 12))
+                            .foregroundStyle(Theme.secondary)
+                        Text("Journal")
+                            .font(.system(size: 18, weight: .black, design: .rounded)).foregroundStyle(.primary)
+                    }
+                    Text(entry.date.formatted(.dateTime.month(.abbreviated).day(.defaultDigits)))
+                        .font(.system(size: 12, weight: .bold, design: .rounded)).foregroundStyle(.secondary)
+                }
+                Spacer()
+                if entry.journalStreakDays > 0 {
+                    HStack(spacing: 4) {
+                        Image(systemName: "flame.fill").font(.system(size: 13)).foregroundStyle(.orange)
+                        Text("\(entry.journalStreakDays)d")
+                            .font(.system(size: 13, weight: .black, design: .rounded)).foregroundStyle(.orange)
+                    }
+                    .padding(.horizontal, 12).padding(.vertical, 6)
+                    .background { Capsule().fill(.orange.opacity(0.15)).glassEffect(.clear) }
+                }
+            }
+            .padding(.horizontal, 18).padding(.top, 18).padding(.bottom, 14)
+
+            if let je = entry.latestJournalEntry {
+                VStack(alignment: .leading, spacing: 8) {
+                    if !je.title.isEmpty {
+                        Text(je.title)
+                            .font(.system(size: 14, weight: .black, design: .rounded))
+                            .foregroundStyle(.primary).lineLimit(1)
+                    }
+                    if !je.body.isEmpty {
+                        Text(je.body)
+                            .font(.system(size: 13, weight: .medium, design: .rounded))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(family == .systemLarge ? 6 : 3)
+                            .lineSpacing(3)
+                    }
+
+                    HStack(spacing: 4) {
+                        Image(systemName: "clock.fill").font(.system(size: 10))
+                        Text(je.date.formatted(date: .omitted, time: .shortened))
+                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                    }
+                    .foregroundStyle(.secondary.opacity(0.6))
+
+                }
+                .padding(14)
+                .glassCard()
+                .padding(.horizontal, 14)
+            } else {
+                HStack(spacing: 12) {
+                    Image(systemName: "pencil.and.scribble").font(.system(size: 26))
+                        .foregroundStyle(LinearGradient(colors: [Theme.primary, Theme.secondary],
+                                                        startPoint: .top, endPoint: .bottom))
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Start today's entry")
+                            .font(.system(size: 14, weight: .black, design: .rounded)).foregroundStyle(.primary)
+                        Text("Tap to write in your journal")
                             .font(.system(size: 12, weight: .bold, design: .rounded)).foregroundStyle(.secondary)
                     }
-                    Spacer()
-                    if entry.journalStreakDays > 0 {
-                        HStack(spacing: 4) {
-                            Image(systemName: "flame.fill").font(.system(size: 13)).foregroundStyle(.orange)
-                            Text("\(entry.journalStreakDays)d")
-                                .font(.system(size: 13, weight: .black, design: .rounded)).foregroundStyle(.orange)
-                        }
-                        .padding(.horizontal, 12).padding(.vertical, 6)
-                        .background { Capsule().fill(.orange.opacity(0.15)).glassEffect(.clear) }
-                    }
                 }
-                .padding(.horizontal, 18).padding(.top, 18).padding(.bottom, 14)
-
-                if let je = entry.latestJournalEntry {
-                    VStack(alignment: .leading, spacing: 8) {
-                        if !je.title.isEmpty {
-                            Text(je.title)
-                                .font(.system(size: 14, weight: .black, design: .rounded))
-                                .foregroundStyle(.primary).lineLimit(1)
-                        }
-                        if !je.body.isEmpty {
-                            Text(je.body)
-                                .font(.system(size: 12, weight: .medium, design: .rounded))
-                                .foregroundStyle(.secondary)
-                                .lineLimit(family == .systemLarge ? 5 : 3)
-                        }
-
-                        HStack(spacing: 4) {
-                            Image(systemName: "clock.fill").font(.system(size: 10))
-                            Text(je.date.formatted(date: .omitted, time: .shortened))
-                                .font(.system(size: 11, weight: .bold, design: .rounded))
-                        }
-                        .foregroundStyle(.secondary.opacity(0.6))
-
-                    }
-                    .padding(14)
-                    .glassCard()
-                    .padding(.horizontal, 14)
-                } else {
-                    HStack(spacing: 12) {
-                        Image(systemName: "pencil.and.scribble").font(.system(size: 26))
-                            .foregroundStyle(LinearGradient(colors: [Theme.primary, Theme.secondary],
-                                                            startPoint: .top, endPoint: .bottom))
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text("Start today's entry")
-                                .font(.system(size: 14, weight: .black, design: .rounded)).foregroundStyle(.primary)
-                            Text("Tap to write in your journal")
-                                .font(.system(size: 12, weight: .bold, design: .rounded)).foregroundStyle(.secondary)
-                        }
-                    }
-                    .padding(14).glassCard().padding(.horizontal, 14)
-                }
-
-                Spacer(minLength: 0)
-
-                HStack {
-                    Spacer()
-                    Text("\(entry.journalCountThisWeek) entries this week")
-                        .font(.system(size: 11, weight: .bold, design: .rounded)).foregroundStyle(.secondary.opacity(0.6))
-                }
-                .padding(.horizontal, 18).padding(.bottom, 12)
+                .padding(14).glassCard().padding(.horizontal, 14)
             }
+
+            Spacer(minLength: 0)
+
+            HStack {
+                Spacer()
+                Text("\(entry.journalCountThisWeek) entries this week")
+                    .font(.system(size: 11, weight: .bold, design: .rounded)).foregroundStyle(.secondary.opacity(0.6))
+            }
+            .padding(.horizontal, 18).padding(.bottom, 12)
         }
         .widgetURL(URL(string: "aurora://journal"))
     }
@@ -736,49 +779,48 @@ struct JournalStreakView: View {
     private let initials = ["M","T","W","T","F","S","S"]
 
     var body: some View {
-        ZStack {
-            AuroraBackground()
-            VStack(spacing: 0) {
-                HStack {
-                    Image(systemName: "book.closed.fill").font(.system(size: 11))
-                        .foregroundStyle(Theme.secondary)
-                    Spacer()
-                    if entry.journalStreakDays > 0 {
-                        Image(systemName: "flame.fill").font(.system(size: 12)).foregroundStyle(.orange)
-                    }
+        VStack(spacing: 0) {
+            HStack {
+                Image(systemName: "book.closed.fill").font(.system(size: 11))
+                    .foregroundStyle(Theme.secondary)
+                Spacer()
+                if entry.journalStreakDays > 0 {
+                    Image(systemName: "flame.fill").font(.system(size: 12)).foregroundStyle(.orange)
                 }
-                .padding(.horizontal, 14).padding(.top, 14)
-
-                Spacer(minLength: 4)
-
-                Text("\(entry.journalStreakDays)")
-                    .font(.system(size: 38, weight: .black, design: .rounded))
-                    .foregroundStyle(LinearGradient(colors: [Theme.primary, Theme.secondary],
-                                                   startPoint: .top, endPoint: .bottom))
-                Text("day streak")
-                    .font(.system(size: 10, weight: .black, design: .rounded)).foregroundStyle(.secondary)
-
-                Spacer(minLength: 8)
-
-                HStack(spacing: 5) {
-                    ForEach(0..<7, id: \.self) { i in
-                        let filled = i < entry.journalCountThisWeek
-                        VStack(spacing: 3) {
-                            Circle()
-                                .fill(filled
-                                      ? AnyShapeStyle(LinearGradient(colors: [Theme.primary, Theme.secondary],
-                                                                      startPoint: .top, endPoint: .bottom))
-                                      : AnyShapeStyle(.white.opacity(scheme == .dark ? 0.08 : 0.25)))
-                                .frame(width: 10, height: 10)
-                                .shadow(color: filled ? Theme.primary.opacity(0.5) : .clear, radius: 3)
-                            Text(initials[i])
-                                .font(.system(size: 7, weight: .black, design: .rounded))
-                                .foregroundStyle(.secondary.opacity(0.5))
-                        }
-                    }
-                }
-                Spacer(minLength: 12)
             }
+            .padding(.horizontal, 14).padding(.top, 14)
+
+            Spacer(minLength: 4)
+
+            Text("\(entry.journalStreakDays)")
+                .font(.system(size: 42, weight: .black, design: .rounded))
+                .foregroundStyle(LinearGradient(colors: [Theme.primary, Theme.secondary],
+                                               startPoint: .topLeading, endPoint: .bottomTrailing))
+                .shadow(color: Theme.primary.opacity(0.3), radius: 8)
+            Text("day streak")
+                .font(.system(size: 11, weight: .black, design: .rounded)).foregroundStyle(.secondary.opacity(0.8))
+
+            Spacer(minLength: 8)
+
+            HStack(spacing: 5) {
+                ForEach(0..<7, id: \.self) { i in
+                    let filled = i < entry.journalCountThisWeek
+                    VStack(spacing: 3) {
+                        Circle()
+                            .fill(filled
+                                  ? AnyShapeStyle(LinearGradient(colors: [Theme.primary, Theme.secondary],
+                                                                  startPoint: .top, endPoint: .bottom))
+                                  : AnyShapeStyle(.white.opacity(scheme == .dark ? 0.08 : 0.25)))
+                            .frame(width: 10, height: 10)
+                            .shadow(color: filled ? Theme.primary.opacity(0.5) : .clear, radius: 3)
+                        Text(initials[i])
+                            .font(.system(size: 7, weight: .black, design: .rounded))
+                            .foregroundStyle(.secondary.opacity(0.5))
+                    }
+                }
+            }
+            .padding(.horizontal, 18).padding(.bottom, 12)
+            Spacer(minLength: 12)
         }
         .widgetURL(URL(string: "aurora://journal"))
     }
@@ -803,77 +845,74 @@ struct WeeklyStatsView: View {
     }
 
     var body: some View {
-        ZStack {
-            AuroraBackground()
-            VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
 
-                HStack {
-                    VStack(alignment: .leading, spacing: 1) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "chart.bar.fill").font(.system(size: 12))
-                                .foregroundStyle(Theme.primary)
-                            Text("Progress")
-                                .font(.system(size: 18, weight: .black, design: .rounded)).foregroundStyle(.primary)
-                        }
-                        Text("This Week")
-                            .font(.system(size: 12, weight: .bold, design: .rounded)).foregroundStyle(.secondary)
+            HStack {
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "chart.bar.fill").font(.system(size: 12))
+                            .foregroundStyle(Theme.primary)
+                        Text("Progress")
+                            .font(.system(size: 18, weight: .black, design: .rounded)).foregroundStyle(.primary)
                     }
-                    Spacer()
-                    VStack(alignment: .trailing, spacing: 1) {
-                        Text("\(avgPct)%")
-                            .font(.system(size: 18, weight: .black, design: .rounded))
-                            .foregroundStyle(LinearGradient(colors: [Theme.primary, Theme.secondary],
-                                                            startPoint: .leading, endPoint: .trailing))
-                        Text("avg")
-                            .font(.system(size: 10, weight: .bold, design: .rounded)).foregroundStyle(.secondary)
-                    }
+                    Text("This Week")
+                        .font(.system(size: 12, weight: .bold, design: .rounded)).foregroundStyle(.secondary)
                 }
-                .padding(.horizontal, 18).padding(.top, 18).padding(.bottom, 14)
-
-                // Bar chart
-                GeometryReader { geo in
-                    let gap:   CGFloat = 6
-                    let barW = (geo.size.width - (gap * 6) - 28) / 7
-                    let maxH = geo.size.height - 20
-                    HStack(alignment: .bottom, spacing: gap) {
-                        ForEach(0..<7, id: \.self) { i in
-                            let r = entry.weeklyRates[i]
-                            let isToday = i == 6
-                            VStack(spacing: 4) {
-                                RoundedRectangle(cornerRadius: 5, style: .continuous)
-                                    .fill(r > 0
-                                          ? AnyShapeStyle(LinearGradient(colors: [Theme.primary, Theme.secondary],
-                                                                          startPoint: .top, endPoint: .bottom))
-                                          : AnyShapeStyle(.white.opacity(scheme == .dark ? 0.06 : 0.2)))
-                                    .frame(width: barW, height: max(4, maxH * r))
-                                    .shadow(color: r > 0 ? Theme.primary.opacity(0.35) : .clear, radius: 4)
-                                    .overlay {
-                                        if isToday {
-                                            RoundedRectangle(cornerRadius: 5)
-                                                .strokeBorder(Theme.primary.opacity(0.7), lineWidth: 1.5)
-                                        }
-                                    }
-                                Text(dayLabels[i])
-                                    .font(.system(size: 9, weight: isToday ? .black : .bold, design: .rounded))
-                                    .foregroundStyle(isToday ? Theme.primary : .secondary.opacity(0.5))
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 14)
-                    .frame(maxHeight: .infinity, alignment: .bottom)
+                Spacer()
+                VStack(alignment: .trailing, spacing: 1) {
+                    Text("\(avgPct)%")
+                        .font(.system(size: 18, weight: .black, design: .rounded))
+                        .foregroundStyle(LinearGradient(colors: [Theme.primary, Theme.secondary],
+                                                        startPoint: .leading, endPoint: .trailing))
+                    Text("avg")
+                        .font(.system(size: 10, weight: .bold, design: .rounded)).foregroundStyle(.secondary)
                 }
-
-                if family == .systemLarge {
-                    HStack(spacing: 10) {
-                        statPill("🔥", "\(entry.longestStreak)d", "Best Streak")
-                        statPill("✅", "\(entry.completedToday)", "Done Today")
-                        statPill("📋", "\(entry.totalToday)", "Total Today")
-                    }
-                    .padding(.horizontal, 14).padding(.top, 12)
-                }
-
-                Spacer(minLength: 14)
             }
+            .padding(.horizontal, 18).padding(.top, 18).padding(.bottom, 14)
+
+            // Bar chart
+            GeometryReader { geo in
+                let gap:   CGFloat = 6
+                let barW = (geo.size.width - (gap * 6) - 28) / 7
+                let maxH = geo.size.height - 20
+                HStack(alignment: .bottom, spacing: gap) {
+                    ForEach(0..<7, id: \.self) { i in
+                        let r = entry.weeklyRates[i]
+                        let isToday = i == 6
+                        VStack(spacing: 4) {
+                            RoundedRectangle(cornerRadius: 5, style: .continuous)
+                                .fill(r > 0
+                                      ? AnyShapeStyle(LinearGradient(colors: [Theme.primary, Theme.secondary],
+                                                                      startPoint: .top, endPoint: .bottom))
+                                      : AnyShapeStyle(.white.opacity(scheme == .dark ? 0.06 : 0.2)))
+                                .frame(width: barW, height: max(6, maxH * r))
+                                .shadow(color: r > 0 ? Theme.primary.opacity(0.4) : .clear, radius: 5)
+                                .overlay {
+                                    if isToday {
+                                        RoundedRectangle(cornerRadius: 5)
+                                            .strokeBorder(Theme.primary.opacity(0.7), lineWidth: 1.5)
+                                    }
+                                }
+                            Text(dayLabels[i])
+                                .font(.system(size: 9, weight: isToday ? .black : .bold, design: .rounded))
+                                .foregroundStyle(isToday ? Theme.primary : .secondary.opacity(0.5))
+                        }
+                    }
+                }
+                .padding(.horizontal, 14)
+                .frame(maxHeight: .infinity, alignment: .bottom)
+            }
+
+            if family == .systemLarge {
+                HStack(spacing: 10) {
+                    statPill("🔥", "\(entry.longestStreak)d", "Best Streak")
+                    statPill("✅", "\(entry.completedToday)", "Done Today")
+                    statPill("📋", "\(entry.totalToday)", "Total Today")
+                }
+                .padding(.horizontal, 14).padding(.top, 12)
+            }
+
+            Spacer(minLength: 14)
         }
         .widgetURL(URL(string: "aurora://stats"))
     }
@@ -897,42 +936,39 @@ struct StreakBadgeView: View {
     let entry: AuroraEntry
 
     var body: some View {
-        ZStack {
-            AuroraBackground()
-            VStack(spacing: 0) {
-                HStack {
-                    Text("STATS")
-                        .font(.system(size: 9, weight: .black, design: .rounded)).foregroundStyle(.secondary)
-                    Spacer()
-                    Image(systemName: "chart.bar.fill").font(.system(size: 11))
-                        .foregroundStyle(Theme.primary)
-                }
-                .padding(.horizontal, 14).padding(.top, 14)
-
-                Spacer(minLength: 4)
-
-                HStack(spacing: 4) {
-                    Image(systemName: "flame.fill").font(.system(size: 26)).foregroundStyle(.orange)
-                    Text("\(entry.longestStreak)")
-                        .font(.system(size: 38, weight: .black, design: .rounded)).foregroundStyle(.primary)
-                }
-                Text("day streak")
-                    .font(.system(size: 10, weight: .black, design: .rounded)).foregroundStyle(.secondary)
-
-                Spacer(minLength: 8)
-
-                Text(String(format: "%.0f%% today", entry.completionRateToday * 100))
-                    .font(.system(size: 11, weight: .black, design: .rounded))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 12).padding(.vertical, 5)
-                    .background {
-                        Capsule()
-                            .fill(Theme.primary)
-                            .shadow(color: Theme.primary.opacity(0.4), radius: 6, x: 0, y: 3)
-                    }
-
-                Spacer(minLength: 12)
+        VStack(spacing: 0) {
+            HStack {
+                Text("STATS")
+                    .font(.system(size: 9, weight: .black, design: .rounded)).foregroundStyle(.secondary)
+                Spacer()
+                Image(systemName: "chart.bar.fill").font(.system(size: 11))
+                    .foregroundStyle(Theme.primary)
             }
+            .padding(.horizontal, 14).padding(.top, 14)
+
+            Spacer(minLength: 4)
+
+            HStack(spacing: 4) {
+                Image(systemName: "flame.fill").font(.system(size: 26)).foregroundStyle(.orange)
+                Text("\(entry.longestStreak)")
+                    .font(.system(size: 38, weight: .black, design: .rounded)).foregroundStyle(.primary)
+            }
+            Text("day streak")
+                .font(.system(size: 11, weight: .black, design: .rounded)).foregroundStyle(.secondary.opacity(0.8))
+
+            Spacer(minLength: 8)
+
+            Text(String(format: "%.0f%% today", entry.completionRateToday * 100))
+                .font(.system(size: 11, weight: .black, design: .rounded))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 12).padding(.vertical, 5)
+                .background {
+                    Capsule()
+                        .fill(Theme.primary)
+                        .shadow(color: Theme.primary.opacity(0.4), radius: 6, x: 0, y: 3)
+                }
+
+            Spacer(minLength: 12)
         }
         .widgetURL(URL(string: "aurora://stats"))
     }
@@ -946,11 +982,14 @@ struct TodayAgendaWidget: Widget {
     let kind = "AuroraTodayAgendaWidget"
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: AuroraProvider()) { entry in
-            TodayAgendaView(entry: entry).containerBackground(.clear, for: .widget)
+            TodayAgendaView(entry: entry)
+                .containerBackground(for: .widget) { AuroraBackground() }
+                .tint(Theme.primary)
         }
         .configurationDisplayName("Today's Agenda")
         .description("View and complete your daily tasks at a glance.")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+        .contentMarginsDisabled()
     }
 }
 
@@ -958,11 +997,14 @@ struct TodayPulseWidget: Widget {
     let kind = "AuroraTodayPulseWidget"
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: AuroraProvider()) { entry in
-            TodayPulseView(entry: entry).containerBackground(.clear, for: .widget)
+            TodayPulseView(entry: entry)
+                .containerBackground(for: .widget) { AuroraBackground() }
+                .tint(Theme.primary)
         }
         .configurationDisplayName("Today's Pulse")
         .description("Completion ring with your next upcoming task.")
         .supportedFamilies([.systemSmall])
+        .contentMarginsDisabled()
     }
 }
 
@@ -970,11 +1012,14 @@ struct TasksByPriorityWidget: Widget {
     let kind = "AuroraTasksByPriorityWidget"
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: AuroraProvider()) { entry in
-            TasksByPriorityView(entry: entry).containerBackground(.clear, for: .widget)
+            TasksByPriorityView(entry: entry)
+                .containerBackground(for: .widget) { AuroraBackground() }
+                .tint(Theme.primary)
         }
         .configurationDisplayName("Task Priorities")
         .description("Pending tasks broken down by priority level.")
         .supportedFamilies([.systemMedium, .systemLarge])
+        .contentMarginsDisabled()
     }
 }
 
@@ -982,11 +1027,14 @@ struct CategoryRingWidget: Widget {
     let kind = "AuroraCategoryRingWidget"
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: AuroraProvider()) { entry in
-            CategoryRingView(entry: entry).containerBackground(.clear, for: .widget)
+            CategoryRingView(entry: entry)
+                .containerBackground(for: .widget) { AuroraBackground() }
+                .tint(Theme.primary)
         }
         .configurationDisplayName("Task Ring")
         .description("Today's completion percentage at a glance.")
         .supportedFamilies([.systemSmall])
+        .contentMarginsDisabled()
     }
 }
 
@@ -994,11 +1042,14 @@ struct JournalPreviewWidget: Widget {
     let kind = "AuroraJournalPreviewWidget"
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: AuroraProvider()) { entry in
-            JournalPreviewView(entry: entry).containerBackground(.clear, for: .widget)
+            JournalPreviewView(entry: entry)
+                .containerBackground(for: .widget) { AuroraBackground() }
+                .tint(Theme.primary)
         }
         .configurationDisplayName("Journal")
         .description("Preview your latest journal entry and writing streak.")
         .supportedFamilies([.systemMedium, .systemLarge])
+        .contentMarginsDisabled()
     }
 }
 
@@ -1006,11 +1057,14 @@ struct JournalStreakWidget: Widget {
     let kind = "AuroraJournalStreakWidget"
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: AuroraProvider()) { entry in
-            JournalStreakView(entry: entry).containerBackground(.clear, for: .widget)
+            JournalStreakView(entry: entry)
+                .containerBackground(for: .widget) { AuroraBackground() }
+                .tint(Theme.primary)
         }
         .configurationDisplayName("Journal Streak")
         .description("Consecutive journaling streak with weekly dots.")
         .supportedFamilies([.systemSmall])
+        .contentMarginsDisabled()
     }
 }
 
@@ -1018,11 +1072,14 @@ struct WeeklyStatsWidget: Widget {
     let kind = "AuroraWeeklyStatsWidget"
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: AuroraProvider()) { entry in
-            WeeklyStatsView(entry: entry).containerBackground(.clear, for: .widget)
+            WeeklyStatsView(entry: entry)
+                .containerBackground(for: .widget) { AuroraBackground() }
+                .tint(Theme.primary)
         }
         .configurationDisplayName("Weekly Progress")
         .description("7-day completion bar chart with average rate.")
         .supportedFamilies([.systemMedium, .systemLarge])
+        .contentMarginsDisabled()
     }
 }
 
@@ -1030,11 +1087,14 @@ struct StreakBadgeWidget: Widget {
     let kind = "AuroraStreakBadgeWidget"
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: AuroraProvider()) { entry in
-            StreakBadgeView(entry: entry).containerBackground(.clear, for: .widget)
+            StreakBadgeView(entry: entry)
+                .containerBackground(for: .widget) { AuroraBackground() }
+                .tint(Theme.primary)
         }
         .configurationDisplayName("Streak")
         .description("Current streak and today's completion rate.")
         .supportedFamilies([.systemSmall])
+        .contentMarginsDisabled()
     }
 }
 
