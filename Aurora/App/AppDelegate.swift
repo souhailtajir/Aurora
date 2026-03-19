@@ -55,8 +55,12 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   private func handle(_ item: UIApplicationShortcutItem) {
     if item.type.hasSuffix(".addTask") {
       QuickActionManager.shared.action = .addTask
-    } else if item.type.hasSuffix(".addJournal") {
-      QuickActionManager.shared.action = .addJournal
     }
+    else if item.type.hasSuffix(".addJournal") {
+      QuickActionManager.shared.action = .addJournal
+    }  
+    else if item.type.hasSuffix(".openCalendar") {
+      QuickActionManager.shared.action = .openCalendar
+    } 
   }
 }

@@ -6,7 +6,7 @@
 	<array>
 		<dict>
 			<key>UIApplicationShortcutItemIconSymbolName</key>
-			<string>plus.circle.fill</string>
+			<string>plus</string>
 			<key>UIApplicationShortcutItemTitle</key>
 			<string>Add Task</string>
 			<key>UIApplicationShortcutItemType</key>
@@ -16,9 +16,17 @@
 			<key>UIApplicationShortcutItemIconSymbolName</key>
 			<string>square.and.pencil</string>
 			<key>UIApplicationShortcutItemTitle</key>
-			<string>New Journal Entry</string>
+			<string>Start Journaling</string>
 			<key>UIApplicationShortcutItemType</key>
 			<string>$(PRODUCT_BUNDLE_IDENTIFIER).addJournal</string>
+		</dict>
+		<dict>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>calendar</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Open Calendar</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER).openCalendar</string>
 		</dict>
 	</array>
 	<key>UTImportedTypeDeclarations</key>

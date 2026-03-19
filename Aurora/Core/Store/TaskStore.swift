@@ -33,7 +33,7 @@ final class TaskStore {
   }
 
   enum QuickAction {
-    case none, addTask, addJournal
+    case none, addTask, addJournal, openCalendar
   }
 
   var quickAction: QuickAction = .none
