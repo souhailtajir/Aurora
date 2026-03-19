@@ -83,6 +83,20 @@ struct ContentView: View {
         }
       }
     }
+    .onChange(of: taskStore.quickAction) { _, action in
+      switch action {
+      case .addTask:
+        showingAddTask = true
+      case .addJournal:
+        withAnimation(.smooth(duration: 0.2)) {
+          selectedTab = 2
+        }
+        taskStore.addJournalTrigger = true
+      case .none:
+        break
+      }
+      taskStore.quickAction = .none
+    }
     .sheet(isPresented: $showingAddTask) {
       TaskSheet()
         .presentationDetents([.large])

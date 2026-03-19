@@ -7,9 +7,11 @@
 
 import SwiftUI
 import SwiftData
+import UIKit
 
 @main
 struct AuroraApp: App {
+  @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
   let container: ModelContainer
   @State private var taskStore: TaskStore
   @State private var userProfileStore = UserProfileStore()
@@ -31,12 +33,18 @@ struct AuroraApp: App {
     }
   }
 
+  // Called once the @State taskStore is ready — wire it to the delegate.
+  private func wireDelegate() {
+    appDelegate.taskStore = taskStore
+  }
+
   var body: some Scene {
     WindowGroup {
       ContentView()
         .environment(taskStore)
         .environment(userProfileStore)
         .preferredColorScheme(.dark)
+        .task { wireDelegate() }
     }
     .modelContainer(container)
   }
