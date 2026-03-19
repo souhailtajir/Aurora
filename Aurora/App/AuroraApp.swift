@@ -33,10 +33,6 @@ struct AuroraApp: App {
     }
   }
 
-  // Called once the @State taskStore is ready — wire it to the delegate.
-  private func wireDelegate() {
-    appDelegate.taskStore = taskStore
-  }
 
   var body: some Scene {
     WindowGroup {
@@ -44,7 +40,6 @@ struct AuroraApp: App {
         .environment(taskStore)
         .environment(userProfileStore)
         .preferredColorScheme(.dark)
-        .task { wireDelegate() }
     }
     .modelContainer(container)
   }

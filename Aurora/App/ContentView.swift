@@ -83,7 +83,7 @@ struct ContentView: View {
         }
       }
     }
-    .onChange(of: taskStore.quickAction) { _, action in
+    .onChange(of: QuickActionManager.shared.action) { _, action in
       switch action {
       case .addTask:
         showingAddTask = true
@@ -95,7 +95,7 @@ struct ContentView: View {
       case .none:
         break
       }
-      taskStore.quickAction = .none
+      QuickActionManager.shared.action = .none
     }
     .sheet(isPresented: $showingAddTask) {
       TaskSheet()
