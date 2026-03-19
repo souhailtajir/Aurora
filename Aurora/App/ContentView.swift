@@ -11,6 +11,8 @@ struct ContentView: View {
   @Environment(TaskStore.self) var taskStore
   @State private var selectedTab: Int = 0
   @State private var showingAddTask = false
+  @State private var showingAddJournal = false
+  @State private var newJournalEntryId: UUID?
 
   var body: some View {
     ZStack(alignment: .top) {
@@ -83,10 +85,35 @@ struct ContentView: View {
         }
       }
     }
+    .onChange(of: QuickActionManager.shared.action) { _, action in
+      switch action {
+      case .addTask:
+        showingAddTask = true
+      case .addJournal:
+        let entry = JournalEntry(title: "", body: "", date: Date())
+        taskStore.addJournalEntry(entry)
+        newJournalEntryId = entry.id
+        showingAddJournal = true
+      case .openCalendar:
+        withAnimation(.smooth(duration: 0.2)) {
+          selectedTab = 3
+        }
+      case .none:
+        break
+      }
+      QuickActionManager.shared.action = .none
+    }
     .sheet(isPresented: $showingAddTask) {
       TaskSheet()
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
+    }
+    .fullScreenCover(isPresented: $showingAddJournal) {
+      if let entryId = newJournalEntryId {
+        NavigationStack {
+          EntryEditorView(entryId: entryId)
+        }
+      }
     }
   }
 }

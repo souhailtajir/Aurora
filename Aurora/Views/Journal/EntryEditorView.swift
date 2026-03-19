@@ -174,7 +174,7 @@ struct EntryEditorView: View {
     .padding(.vertical, 10)
     .background {
       Capsule()
-        .glassEffect(.interactive())
+        .glassEffect(.regular)
     }
     .padding(.horizontal, 24)
     .padding(.bottom, 8)
@@ -301,7 +301,7 @@ struct EntryEditorView: View {
   }
 
   private func save() {
-    guard hasLoaded, var entry = entry else { return }
+    guard hasLoaded, let entry = entry else { return }
     entry.title = title
     entry.body = entryBody
     taskStore.updateJournalEntry(entry)
@@ -317,13 +317,13 @@ struct EntryEditorView: View {
   }
 
   private func addImageToEntry(_ data: Data) {
-    guard var entry = entry else { return }
+    guard let entry = entry else { return }
     entry.images.append(data)
     taskStore.updateJournalEntry(entry)
   }
 
   private func removeImage(at index: Int) {
-    guard var entry = entry else { return }
+    guard let entry = entry else { return }
     entry.images.remove(at: index)
     taskStore.updateJournalEntry(entry)
   }
@@ -348,7 +348,7 @@ struct EntryEditorView: View {
   private func toggleLocation() {
     // If location already exists, remove it
     if entry?.locationName != nil {
-      guard var entry = entry else { return }
+      guard let entry = entry else { return }
       entry.locationName = nil
       entry.latitude = nil
       entry.longitude = nil
@@ -361,7 +361,7 @@ struct EntryEditorView: View {
       isLoadingLocation = true
 
       if let location = await locationService.getCurrentLocation() {
-        guard var entry = entry else {
+        guard let entry = entry else {
           isLoadingLocation = false
           return
         }

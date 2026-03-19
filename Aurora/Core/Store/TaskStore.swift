@@ -32,6 +32,12 @@ final class TaskStore {
     case none, home, tasks
   }
 
+  enum QuickAction {
+    case none, addTask, addJournal, openCalendar
+  }
+
+  var quickAction: QuickAction = .none
+
   private var modelContext: ModelContext
 
   init(modelContext: ModelContext) {

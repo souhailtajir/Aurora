@@ -7,9 +7,11 @@
 
 import SwiftUI
 import SwiftData
+import UIKit
 
 @main
 struct AuroraApp: App {
+  @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
   let container: ModelContainer
   @State private var taskStore: TaskStore
   @State private var userProfileStore = UserProfileStore()
@@ -30,6 +32,7 @@ struct AuroraApp: App {
       fatalError("Could not create ModelContainer: \(error)")
     }
   }
+
 
   var body: some Scene {
     WindowGroup {
