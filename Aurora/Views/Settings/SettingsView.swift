@@ -12,8 +12,6 @@ struct SettingsView: View {
   @Environment(TaskStore.self) private var taskStore
   @State private var showingBirthDatePicker = false
   @State private var showingResetAlert = false
-  @State private var hapticFeedback = true
-  @State private var completionSounds = true
 
   private var totalCompleted: Int {
     taskStore.tasks.filter { $0.isCompleted }.count
@@ -28,53 +26,8 @@ struct SettingsView: View {
           onEdit: { showingBirthDatePicker = true }
         )
 
-        // Display Preferences
-        SettingsSection(title: "Display") {
-          VStack(spacing: 0) {
-            PickerRow(
-              icon: "sparkles",
-              iconColor: .purple,
-              title: "Celestial Mode",
-              selection: Binding(
-                get: { userProfileStore.profile.celestialDisplayMode },
-                set: { userProfileStore.updateCelestialDisplayMode($0) }
-              )
-            )
-          }
-          .glassEffect(.clear)
-        }
-
-        // Calendar Settings
-        SettingsSection(title: "Calendar") {
-          VStack(spacing: 0) {
-            HStack(spacing: 12) {
-              Image(systemName: "calendar")
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(.blue)
-
-              Text("Week Starts on Monday")
-                .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(.primary)
-
-              Spacer()
-
-              Toggle(
-                "",
-                isOn: Binding(
-                  get: { taskStore.weekStartsOnMonday },
-                  set: { taskStore.weekStartsOnMonday = $0 }
-                )
-              )
-              .tint(Theme.secondary)
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 14)
-          }
-          .glassEffect(.clear)
-        }
-
-        // App Settings
-        SettingsSection(title: "App Settings") {
+        // General
+        SettingsSection(title: "General") {
           VStack(spacing: 0) {
             NavigationLink(value: SettingsDestination.appearance) {
               SettingsRow(
@@ -88,17 +41,45 @@ struct SettingsView: View {
 
             CustomDivider()
 
-            NavigationLink(value: SettingsDestination.notifications) {
-              SettingsRow(
-                icon: "bell.fill",
-                iconColor: .red,
-                title: "Notifications",
-                value: "Enabled"
+            PickerRow(
+              icon: "sparkles",
+              iconColor: .purple,
+              title: "Celestial Mode",
+              selection: Binding(
+                get: { userProfileStore.profile.celestialDisplayMode },
+                set: { userProfileStore.updateCelestialDisplayMode($0) }
               )
+            )
+
+            CustomDivider()
+
+            HStack(spacing: 12) {
+              Image(systemName: "calendar")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(.orange)
+
+              Text("Week Starts on Monday")
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(.primary)
+
+              Spacer()
+
+              Toggle(
+                "",
+                isOn: Binding(
+                  get: { taskStore.weekStartsOnMonday },
+                  set: {
+                    taskStore.weekStartsOnMonday = $0
+                    HapticService.shared.selection()
+                  }
+                )
+              )
+              .tint(Theme.secondary)
             }
-            .buttonStyle(.plain)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 14)
           }
-          .glassEffect(.clear)
+          .glassEffect(.regular)
         }
 
         // Sounds & Haptics
@@ -108,7 +89,13 @@ struct SettingsView: View {
               icon: "speaker.wave.2.fill",
               iconColor: .pink,
               title: "Completion Sounds",
-              isOn: $completionSounds
+              isOn: Binding(
+                get: { taskStore.completionSoundsEnabled },
+                set: {
+                  taskStore.completionSoundsEnabled = $0
+                  HapticService.shared.selection()
+                }
+              )
             )
 
             CustomDivider()
@@ -117,8 +104,86 @@ struct SettingsView: View {
               icon: "iphone.radiowaves.left.and.right",
               iconColor: .orange,
               title: "Haptic Feedback",
-              isOn: $hapticFeedback
+              isOn: Binding(
+                get: { taskStore.hapticFeedbackEnabled },
+                set: {
+                  taskStore.hapticFeedbackEnabled = $0
+                  if $0 {
+                    HapticService.shared.impact(.medium)
+                  }
+                }
+              )
             )
+          }
+          .glassEffect(.regular)
+        }
+
+        // Journal
+        SettingsSection(title: "Journal") {
+          VStack(spacing: 0) {
+            SettingsRow(
+              icon: "text.book.closed.fill",
+              iconColor: Theme.primary,
+              title: "Default Theme",
+              value: "System",
+              showChevron: false
+            )
+
+            CustomDivider()
+
+            SettingsRow(
+              icon: "sparkles.rectangle.stack",
+              iconColor: .cyan,
+              title: "Journaling Suggestions",
+              value: "Enabled",
+              showChevron: false
+            )
+          }
+          .glassEffect(.regular)
+        }
+
+        // Notifications
+        SettingsSection(title: "Notifications") {
+          VStack(spacing: 0) {
+            NavigationLink(value: SettingsDestination.notifications) {
+              SettingsRow(
+                icon: "bell.badge.fill",
+                iconColor: .red,
+                title: "Notifications",
+                value: "Manage"
+              )
+            }
+            .buttonStyle(.plain)
+          }
+          .glassEffect(.regular)
+        }
+
+        // Privacy & Security
+        SettingsSection(title: "Privacy & Security") {
+          VStack(spacing: 0) {
+            SettingsRow(
+              icon: "faceid",
+              iconColor: .green,
+              title: "Journal Lock",
+              value: "Face ID",
+              showChevron: false
+            )
+
+            CustomDivider()
+
+            Button {
+              if let url = URL(string: "https://example.com/privacy") {
+                UIApplication.shared.open(url)
+              }
+            } label: {
+              SettingsRow(
+                icon: "hand.raised.fill",
+                iconColor: .mint,
+                title: "Privacy Policy",
+                value: ""
+              )
+            }
+            .buttonStyle(.plain)
           }
           .glassEffect(.regular)
         }
@@ -161,29 +226,13 @@ struct SettingsView: View {
             CustomDivider()
 
             Button {
-              if let url = URL(string: "https://example.com/privacy") {
-                UIApplication.shared.open(url)
-              }
-            } label: {
-              SettingsRow(
-                icon: "hand.raised.fill",
-                iconColor: .green,
-                title: "Privacy Policy",
-                value: ""
-              )
-            }
-            .buttonStyle(.plain)
-
-            CustomDivider()
-
-            Button {
               if let url = URL(string: "https://example.com/terms") {
                 UIApplication.shared.open(url)
               }
             } label: {
               SettingsRow(
                 icon: "doc.text.fill",
-                iconColor: .mint,
+                iconColor: .secondary,
                 title: "Terms of Service",
                 value: ""
               )
@@ -197,6 +246,7 @@ struct SettingsView: View {
         SettingsSection(title: "Danger Zone") {
           VStack(spacing: 0) {
             Button {
+              HapticService.shared.notification(.warning)
               taskStore.clearCompletedTasks()
             } label: {
               SettingsRow(
@@ -211,6 +261,7 @@ struct SettingsView: View {
             CustomDivider()
 
             Button {
+              HapticService.shared.notification(.warning)
               showingResetAlert = true
             } label: {
               SettingsRow(
@@ -241,9 +292,9 @@ struct SettingsView: View {
     .alert("Reset All Settings?", isPresented: $showingResetAlert) {
       Button("Cancel", role: .cancel) {}
       Button("Reset", role: .destructive) {
-        // Reset settings to defaults
-        hapticFeedback = true
-        completionSounds = true
+        taskStore.hapticFeedbackEnabled = true
+        taskStore.completionSoundsEnabled = true
+        HapticService.shared.notification(.success)
       }
     } message: {
       Text("This will reset all settings to their default values. Your tasks will not be affected.")
@@ -344,22 +395,35 @@ struct HeroProfileView: View {
 
       Spacer()
 
-      // Avatar
-      Circle()
-        .fill(
-          LinearGradient(
-            colors: [Theme.secondary, Theme.primary],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
+      // Avatar with gradient ring
+      ZStack {
+        // Animated gradient ring
+        Circle()
+          .strokeBorder(
+            AngularGradient(
+              colors: [Theme.primary, Theme.secondary, .cyan, Theme.primary],
+              center: .center
+            ),
+            lineWidth: 3
           )
-        )
-        .frame(width: 84, height: 84)
-        .overlay(
-          Text(profile.name.prefix(1))
-            .font(.system(size: 36, weight: .bold, design: .rounded))
-            .foregroundStyle(.white)
-        )
-        .shadow(color: Theme.secondary.opacity(0.4), radius: 12, x: 0, y: 6)
+          .frame(width: 90, height: 90)
+
+        Circle()
+          .fill(
+            LinearGradient(
+              colors: [Theme.secondary, Theme.primary],
+              startPoint: .topLeading,
+              endPoint: .bottomTrailing
+            )
+          )
+          .frame(width: 80, height: 80)
+          .overlay(
+            Text(profile.name.prefix(1))
+              .font(.system(size: 34, weight: .bold, design: .rounded))
+              .foregroundStyle(.white)
+          )
+      }
+      .shadow(color: Theme.secondary.opacity(0.3), radius: 16, x: 0, y: 8)
     }
     .frame(maxWidth: .infinity)
     .padding(24)
@@ -480,6 +544,7 @@ struct AppearanceSettingsView: View {
           ForEach(["Light", "Dark", "System"], id: \.self) { option in
             Button {
               selectedAppearance = option
+              HapticService.shared.selection()
             } label: {
               HStack(spacing: 12) {
                 Image(systemName: iconForAppearance(option))

@@ -5,6 +5,7 @@
 import AVFoundation
 import CoreLocation
 import PhotosUI
+import Speech
 import SwiftUI
 
 struct EntryEditorView: View {
@@ -22,10 +23,16 @@ struct EntryEditorView: View {
   // Toolbar state
   @State private var showCamera = false
   @State private var showSuggestions = false
-  @State private var showVoiceAlert = false
   @State private var showMagicAlert = false
   @State private var locationService = LocationService()
   @State private var isLoadingLocation = false
+
+  // Dictation state
+  @State private var isDictating = false
+  @State private var speechRecognizer = SFSpeechRecognizer(locale: Locale.current)
+  @State private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
+  @State private var recognitionTask: SFSpeechRecognitionTask?
+  @State private var audioEngine = AVAudioEngine()
 
   private var entry: JournalEntry? {
     taskStore.journalEntries.first { $0.id == entryId }
@@ -88,13 +95,6 @@ struct EntryEditorView: View {
         save()
       }
     }
-    .alert("Voice Recording", isPresented: $showVoiceAlert) {
-      Button("OK", role: .cancel) {}
-    } message: {
-      Text(
-        "Voice recording feature coming soon! This will allow you to add audio notes to your journal entries."
-      )
-    }
     .alert("Writing Tools", isPresented: $showMagicAlert) {
       Button("OK", role: .cancel) {}
     } message: {
@@ -138,13 +138,14 @@ struct EntryEditorView: View {
           .foregroundStyle(Theme.tint)
       }
 
-      // Voice recording
+      // Voice dictation
       Button {
-        showVoiceAlert = true
+        toggleDictation()
       } label: {
-        Image(systemName: "waveform")
+        Image(systemName: isDictating ? "mic.fill" : "waveform")
           .font(.system(size: 22))
-          .foregroundStyle(Theme.tint)
+          .foregroundStyle(isDictating ? .red : Theme.tint)
+          .symbolEffect(.pulse, isActive: isDictating)
       }
 
       // Location - toggle on/off
@@ -378,5 +379,89 @@ struct EntryEditorView: View {
 
       isLoadingLocation = false
     }
+  }
+
+  // MARK: - Dictation
+
+  private func toggleDictation() {
+    if isDictating {
+      stopDictation()
+    } else {
+      startDictation()
+    }
+  }
+
+  private func startDictation() {
+    SFSpeechRecognizer.requestAuthorization { status in
+      guard status == .authorized else { return }
+
+      AVAudioApplication.requestRecordPermission { granted in
+        guard granted else { return }
+
+        AsyncTask { @MainActor in
+          do {
+            try beginAudioRecognition()
+            isDictating = true
+            HapticService.shared.impact(.medium)
+          } catch {
+            print("Failed to start dictation: \(error)")
+          }
+        }
+      }
+    }
+  }
+
+  private func beginAudioRecognition() throws {
+    // Cancel any existing task
+    recognitionTask?.cancel()
+    recognitionTask = nil
+
+    let audioSession = AVAudioSession.sharedInstance()
+    try audioSession.setCategory(.record, mode: .measurement, options: .duckOthers)
+    try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+
+    recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
+    guard let recognitionRequest = recognitionRequest else { return }
+    recognitionRequest.shouldReportPartialResults = true
+
+    let textBeforeDictation = entryBody
+
+    recognitionTask = speechRecognizer?.recognitionTask(with: recognitionRequest) { result, error in
+      if let result = result {
+        let transcription = result.bestTranscription.formattedString
+        if textBeforeDictation.isEmpty {
+          entryBody = transcription
+        } else {
+          entryBody = textBeforeDictation + "\n" + transcription
+        }
+      }
+
+      if error != nil || (result?.isFinal ?? false) {
+        stopDictation()
+      }
+    }
+
+    let inputNode = audioEngine.inputNode
+    let recordingFormat = inputNode.outputFormat(forBus: 0)
+    inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { buffer, _ in
+      recognitionRequest.append(buffer)
+    }
+
+    audioEngine.prepare()
+    try audioEngine.start()
+  }
+
+  private func stopDictation() {
+    audioEngine.stop()
+    audioEngine.inputNode.removeTap(onBus: 0)
+    recognitionRequest?.endAudio()
+    recognitionRequest = nil
+    recognitionTask?.cancel()
+    recognitionTask = nil
+    isDictating = false
+    save()
+    HapticService.shared.impact(.light)
+
+    try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
   }
 }

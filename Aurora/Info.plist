@@ -45,5 +45,9 @@
 	<string>Aurora uses your location to tag journal entries with where they were written</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Aurora uses your microphone to add voice recordings to journal entries</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Aurora uses speech recognition to transcribe your voice into journal entries</string>
+	<key>NSJournalingSuggestionsUsageDescription</key>
+	<string>Aurora uses journaling suggestions to help inspire your journal entries</string>
 </dict>
 </plist>

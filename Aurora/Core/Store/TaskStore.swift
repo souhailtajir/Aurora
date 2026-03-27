@@ -26,6 +26,8 @@ final class TaskStore {
   var pinnedHomeSmartLists: [SmartListType] = [.flagged] { didSet { saveSettings() } }
   var pinnedHomeCategoryIds: [UUID] = [] { didSet { saveSettings() } }
   var weekStartsOnMonday: Bool = true { didSet { saveSettings() } }
+  var hapticFeedbackEnabled: Bool = true { didSet { saveSettings() } }
+  var completionSoundsEnabled: Bool = true { didSet { saveSettings() } }
   var myListsExpanded: Bool = true
 
   enum AddTaskTrigger {
@@ -128,6 +130,11 @@ final class TaskStore {
     task.isCompleted.toggle()
     saveContext()
     fetchTasks()
+    if task.isCompleted {
+      HapticService.shared.notification(.success)
+    } else {
+      HapticService.shared.impact(.light)
+    }
   }
 
   func clearCompletedTasks() {
@@ -162,6 +169,7 @@ final class TaskStore {
     modelContext.insert(entry)
     saveContext()
     fetchJournal()
+    HapticService.shared.impact(.medium)
   }
 
   func deleteJournalEntry(_ entry: JournalEntry) {
@@ -215,6 +223,8 @@ final class TaskStore {
           self.pinnedHomeSmartLists = settings.pinnedHomeSmartLists
           self.pinnedHomeCategoryIds = settings.pinnedHomeCategoryIds
           self.weekStartsOnMonday = settings.weekStartsOnMonday
+          self.hapticFeedbackEnabled = settings.hapticFeedbackEnabled
+          self.completionSoundsEnabled = settings.completionSoundsEnabled
       }
   }
 
@@ -225,7 +235,9 @@ final class TaskStore {
         smartListOrder: smartListOrder,
         pinnedHomeSmartLists: Array(pinnedHomeSmartLists),
         pinnedHomeCategoryIds: Array(pinnedHomeCategoryIds),
-        weekStartsOnMonday: weekStartsOnMonday
+        weekStartsOnMonday: weekStartsOnMonday,
+        hapticFeedbackEnabled: hapticFeedbackEnabled,
+        completionSoundsEnabled: completionSoundsEnabled
       )
       if let data = try? JSONEncoder().encode(settings) {
           UserDefaults.standard.set(data, forKey: "AppSettings")
