@@ -138,6 +138,8 @@ struct AppSettings: Codable {
   var pinnedHomeSmartLists: [SmartListType]
   var pinnedHomeCategoryIds: [UUID]
   var weekStartsOnMonday: Bool
+  var hapticFeedbackEnabled: Bool
+  var completionSoundsEnabled: Bool
 
   init(
     visibleSmartLists: [SmartListType] = [],
@@ -145,7 +147,9 @@ struct AppSettings: Codable {
     smartListOrder: [SmartListType] = [],
     pinnedHomeSmartLists: [SmartListType] = [.flagged],
     pinnedHomeCategoryIds: [UUID] = [],
-    weekStartsOnMonday: Bool = true
+    weekStartsOnMonday: Bool = true,
+    hapticFeedbackEnabled: Bool = true,
+    completionSoundsEnabled: Bool = true
   ) {
     self.visibleSmartLists = visibleSmartLists
     self.visibleCategories = visibleCategories
@@ -153,6 +157,8 @@ struct AppSettings: Codable {
     self.pinnedHomeSmartLists = pinnedHomeSmartLists
     self.pinnedHomeCategoryIds = pinnedHomeCategoryIds
     self.weekStartsOnMonday = weekStartsOnMonday
+    self.hapticFeedbackEnabled = hapticFeedbackEnabled
+    self.completionSoundsEnabled = completionSoundsEnabled
   }
 }
 
