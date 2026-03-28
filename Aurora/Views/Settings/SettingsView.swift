@@ -120,7 +120,7 @@ struct SettingsView: View {
               isOn: $hapticFeedback
             )
           }
-          .glassEffect(.regular)
+          .glassEffect(.clear)
         }
 
         // Data & Storage
