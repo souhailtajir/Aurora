@@ -8,7 +8,7 @@
 			<key>UIApplicationShortcutItemIconSymbolName</key>
 			<string>plus</string>
 			<key>UIApplicationShortcutItemTitle</key>
-			<string>Add Task</string>
+			<string>New Task</string>
 			<key>UIApplicationShortcutItemType</key>
 			<string>$(PRODUCT_BUNDLE_IDENTIFIER).addTask</string>
 		</dict>
@@ -16,7 +16,7 @@
 			<key>UIApplicationShortcutItemIconSymbolName</key>
 			<string>square.and.pencil</string>
 			<key>UIApplicationShortcutItemTitle</key>
-			<string>Start Journaling</string>
+			<string>New Journal</string>
 			<key>UIApplicationShortcutItemType</key>
 			<string>$(PRODUCT_BUNDLE_IDENTIFIER).addJournal</string>
 		</dict>
@@ -24,7 +24,7 @@
 			<key>UIApplicationShortcutItemIconSymbolName</key>
 			<string>calendar</string>
 			<key>UIApplicationShortcutItemTitle</key>
-			<string>Open Calendar</string>
+			<string>Calendar</string>
 			<key>UIApplicationShortcutItemType</key>
 			<string>$(PRODUCT_BUNDLE_IDENTIFIER).openCalendar</string>
 		</dict>
