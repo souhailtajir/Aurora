@@ -34,7 +34,7 @@ struct BottomSearchBar: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .glassEffect(.regular.interactive())
+        .glassEffect(.clear.interactive())
         .clipShape(Capsule())
 
         // Circular X dismiss button (separate from search field)
@@ -46,7 +46,7 @@ struct BottomSearchBar: View {
         .buttonStyle(.plain)
         .frame(width: 44, height: 44)
         .contentShape(Circle())
-        .glassEffect(.regular.interactive())
+        .glassEffect(.clear.interactive())
         .clipShape(Circle())
       }
       .padding(.horizontal, 16)
