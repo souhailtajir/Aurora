@@ -175,7 +175,7 @@ struct EntryEditorView: View {
     .padding(.vertical, 10)
     .background {
       Capsule()
-        .glassEffect(.regular)
+        .glassEffect(.clear)
     }
     .padding(.horizontal, 24)
     .padding(.bottom, 8)
