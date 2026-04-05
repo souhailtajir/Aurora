@@ -530,7 +530,7 @@ struct JournalView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
-        .glassEffect(.clear)
+        .glassEffect()
       }
       .buttonStyle(.plain)
     }
