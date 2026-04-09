@@ -278,6 +278,6 @@ struct DeletedEntriesView: View {
       .contentShape(Rectangle())
     }
     .buttonStyle(.plain)
-    .glassEffect(.clear)
+    .glassEffect()
   }
 }
