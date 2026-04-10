@@ -223,7 +223,7 @@ struct DeletedEntriesView: View {
       }
     }
     .padding(12)
-    .glassEffect(.clear, in: .capsule)
+    .glassEffect(.regular, in: .capsule)
     .padding(.horizontal, 16)
     .padding(.bottom, 8)
   }
@@ -278,6 +278,6 @@ struct DeletedEntriesView: View {
       .contentShape(Rectangle())
     }
     .buttonStyle(.plain)
-    .glassEffect()
+    .glassEffect(.clear)
   }
 }
