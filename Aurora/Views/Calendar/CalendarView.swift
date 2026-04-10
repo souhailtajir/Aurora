@@ -192,7 +192,7 @@ struct CalendarView: View {
             .font(.system(size: 16, weight: .semibold))
             .foregroundStyle(Theme.primary)
             .frame(width: 36, height: 36)
-            .glassEffect(.clear)
+            .glassEffect(.regular)
         }
 
         Spacer()
@@ -202,7 +202,7 @@ struct CalendarView: View {
           .foregroundStyle(.primary)
           .padding(.horizontal, 20)
           .padding(.vertical, 10)
-          .glassEffect(.clear)
+          .glassEffect(.regular)
 
         Spacer()
 
@@ -216,7 +216,7 @@ struct CalendarView: View {
             .font(.system(size: 16, weight: .semibold))
             .foregroundStyle(Theme.primary)
             .frame(width: 36, height: 36)
-            .glassEffect(.clear)
+            .glassEffect(.regular)
         }
       }
       .padding(.horizontal, 8)
@@ -276,7 +276,7 @@ struct CalendarView: View {
       .background {
         if isSelected {
           Circle()
-            .glassEffect(.clear.tint(Theme.primary))
+            .glassEffect(.regular.tint(Theme.primary))
             .matchedGeometryEffect(id: "selectedDay", in: namespace)
         } else if isToday {
           Circle()
