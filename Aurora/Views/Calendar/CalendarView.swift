@@ -435,3 +435,10 @@ struct CalendarView: View {
     }
   }
 }
+
+#Preview {
+  PreviewContainer {
+    CalendarView()
+  }
+}
+

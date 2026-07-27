@@ -119,3 +119,10 @@ struct AllEntriesView: View {
     }
   }
 }
+
+#Preview {
+  PreviewContainer {
+    AllEntriesView()
+  }
+}
+

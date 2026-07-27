@@ -399,5 +399,11 @@ struct HomeView: View {
       }
     }
   }
-
 }
+
+#Preview {
+  PreviewContainer {
+    HomeView()
+  }
+}
+

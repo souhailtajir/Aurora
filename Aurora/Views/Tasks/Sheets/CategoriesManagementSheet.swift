@@ -76,3 +76,10 @@ struct CategoriesManagementSheet: View {
     }
   }
 }
+
+#Preview {
+  PreviewContainer {
+    CategoriesManagementSheet()
+  }
+}
+

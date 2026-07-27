@@ -536,3 +536,10 @@ struct JournalView: View {
     }
   }
 }
+
+#Preview {
+  PreviewContainer {
+    JournalView()
+  }
+}
+

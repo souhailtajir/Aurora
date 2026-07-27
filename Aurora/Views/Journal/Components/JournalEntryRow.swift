@@ -52,3 +52,14 @@ struct JournalEntryRow: View {
     }
   }
 }
+
+#Preview {
+  PreviewContainer {
+    JournalEntryRow(
+      entry: JournalEntry(title: "Morning Thoughts", body: "Feeling inspired today.", date: Date()),
+      onTap: {}
+    )
+    .padding()
+  }
+}
+

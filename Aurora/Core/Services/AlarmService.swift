@@ -69,6 +69,12 @@ class AlarmService {
     let time = Alarm.Schedule.Relative.Time(hour: hour, minute: minute)
     let schedule = Alarm.Schedule.relative(Alarm.Schedule.Relative(time: time, repeats: .never))
 
+    // Require iOS 26.1+ for alarm presentation with snooze button
+    guard #available(iOS 26.1, *) else {
+      print("[AlarmService] Alarm scheduling requires iOS 26.1 or newer")
+      return
+    }
+
     // Create the alert presentation with Aurora purple snooze button
     let snoozeButton = AlarmButton(
       text: LocalizedStringResource(stringLiteral: "Snooze"),

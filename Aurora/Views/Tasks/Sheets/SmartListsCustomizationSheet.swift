@@ -93,3 +93,10 @@ struct SmartListIcon: View {
     }
   }
 }
+
+#Preview {
+  PreviewContainer {
+    SmartListsCustomizationSheet()
+  }
+}
+

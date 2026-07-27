@@ -3,7 +3,6 @@
 //  Aurora
 //
 
-import JournalingSuggestions
 import SwiftUI
 
 struct JournalSuggestionsSheet: View {
@@ -37,7 +36,7 @@ struct JournalSuggestionsSheet: View {
 
       ScrollView(showsIndicators: false) {
         VStack(spacing: 16) {
-          // Apple Journaling Suggestions Picker
+          // Suggestions For You section
           journalingSuggestionsSection
 
           // Static prompts
@@ -61,33 +60,37 @@ struct JournalSuggestionsSheet: View {
         .foregroundStyle(.secondary)
         .textCase(.uppercase)
 
-      JournalingSuggestionsPicker {
-        HStack(spacing: 12) {
-          Image(systemName: "wand.and.stars")
-            .font(.system(size: 20))
-            .foregroundStyle(Theme.primary)
-            .frame(width: 32)
+      ForEach(suggestedPrompts, id: \.title) { suggestion in
+        Button {
+          HapticService.shared.impact(.light)
+          onSuggestionSelected(suggestion.prompt)
+          dismiss()
+        } label: {
+          HStack(spacing: 12) {
+            Image(systemName: suggestion.icon)
+              .font(.system(size: 20))
+              .foregroundStyle(Theme.primary)
+              .frame(width: 32)
 
-          Text("Browse Suggestions")
-            .font(.system(size: 15, weight: .medium))
-            .foregroundStyle(.primary)
+            Text(suggestion.title)
+              .font(.system(size: 15, weight: .medium))
+              .foregroundStyle(.primary)
 
-          Spacer()
+            Spacer()
 
-          Image(systemName: "chevron.right")
-            .font(.system(size: 14, weight: .semibold))
-            .foregroundStyle(.tertiary)
+            Image(systemName: "plus")
+              .font(.system(size: 18))
+              .foregroundStyle(Theme.primary.opacity(0.6))
+          }
+          .padding(.horizontal, 14)
+          .padding(.vertical, 12)
+          .background {
+            RoundedRectangle(cornerRadius: 12)
+              .glassEffect(.clear)
+          }
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .background {
-          RoundedRectangle(cornerRadius: 12)
-            .glassEffect(.clear)
-        }
-      } onCompletion: { suggestion in
-        handleSuggestion(suggestion)
+        .buttonStyle(.plain)
       }
-      .buttonStyle(.plain)
     }
   }
 
@@ -134,19 +137,35 @@ struct JournalSuggestionsSheet: View {
     }
   }
 
-  // MARK: - Handle Apple Suggestion
+  // MARK: - Suggested Prompts
 
-  private func handleSuggestion(_ suggestion: JournalingSuggestion) {
-    HapticService.shared.notification(.success)
+  private var suggestedPrompts: [(icon: String, title: String, prompt: String)] {
+    let calendar = Calendar.current
+    let hour = calendar.component(.hour, from: Date())
 
-    var parts: [String] = []
-
-    if !suggestion.title.isEmpty {
-      parts.append("## \(suggestion.title)")
+    // Return contextual suggestions based on time of day
+    if hour < 12 {
+      return [
+        ("sunrise.fill", "Start Your Day", "What are your intentions for today?"),
+        ("cup.and.saucer.fill", "Morning Energy", "How did you sleep and how are you feeling right now?"),
+      ]
+    } else if hour < 17 {
+      return [
+        ("sun.max.fill", "Midday Check-in", "How is your day going so far?"),
+        ("bolt.fill", "Momentum", "What have you accomplished today that you're proud of?"),
+      ]
+    } else {
+      return [
+        ("sunset.fill", "Wind Down", "What was the highlight of your day?"),
+        ("moon.fill", "Evening Gratitude", "What are you thankful for today?"),
+      ]
     }
-
-    let text = parts.joined(separator: "\n\n")
-    onSuggestionSelected(text.isEmpty ? suggestion.title : text)
-    dismiss()
   }
+}
+
+#Preview {
+  JournalSuggestionsSheet { prompt in
+    print("Selected: \(prompt)")
+  }
+  .preferredColorScheme(.dark)
 }

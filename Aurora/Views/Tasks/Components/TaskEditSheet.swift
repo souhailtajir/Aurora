@@ -247,3 +247,13 @@ struct TaskEditSheet: View {
         }
     }
 }
+
+#Preview {
+    PreviewContainer {
+        TaskEditSheet(
+            task: Task(title: "Review Design Specs", notes: "Check Figma files"),
+            onDismiss: {}
+        )
+    }
+}
+

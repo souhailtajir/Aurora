@@ -221,3 +221,10 @@ struct PinnedCardsSheet: View {
     dismiss()
   }
 }
+
+#Preview {
+  PreviewContainer {
+    PinnedCardsSheet()
+  }
+}
+

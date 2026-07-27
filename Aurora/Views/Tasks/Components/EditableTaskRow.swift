@@ -217,3 +217,24 @@ struct EditableTaskRow: View {
     return date < Date() && !task.isCompleted
   }
 }
+
+#Preview {
+  PreviewContainer {
+    EditableTaskRowContainer()
+  }
+}
+
+private struct EditableTaskRowContainer: View {
+  @State private var editingTaskId: UUID? = nil
+  @FocusState private var focusedTaskId: UUID?
+
+  var body: some View {
+    EditableTaskRow(
+      task: Task(title: "Complete project documentation", date: Date(), isFlagged: true),
+      editingTaskId: $editingTaskId,
+      focusedTaskId: $focusedTaskId
+    )
+    .padding()
+  }
+}
+

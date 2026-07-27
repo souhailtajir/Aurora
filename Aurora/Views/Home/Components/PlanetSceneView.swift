@@ -147,3 +147,11 @@ private struct SceneKitView: UIViewRepresentable {
     return scene
   }
 }
+
+#Preview {
+  ZStack {
+    Color.black.ignoresSafeArea()
+    PlanetSceneView(planet: .jupiter)
+  }
+}
+

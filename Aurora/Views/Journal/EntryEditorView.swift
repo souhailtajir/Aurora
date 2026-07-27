@@ -465,3 +465,10 @@ struct EntryEditorView: View {
     try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
   }
 }
+
+#Preview {
+  PreviewContainer {
+    EntryEditorView(entryId: UUID())
+  }
+}
+

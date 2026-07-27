@@ -281,3 +281,10 @@ struct DeletedEntriesView: View {
     .glassEffect()
   }
 }
+
+#Preview {
+  PreviewContainer {
+    DeletedEntriesView()
+  }
+}
+

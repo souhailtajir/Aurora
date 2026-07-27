@@ -11,11 +11,10 @@
 		888888888882222222222222 /* Aurora/Core/Models/JournalModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 777777777772222222222222 /* Aurora/Core/Models/JournalModels.swift */; };
 		888888888883333333333333 /* Aurora/Core/Design/Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 777777777773333333333333 /* Aurora/Core/Design/Theme.swift */; };
 		888888888884444444444444 /* Aurora/Core/Models/SmartListType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 777777777774444444444444 /* Aurora/Core/Models/SmartListType.swift */; };
+		B1B1B1B1B1B1B1B1B1B1B1B1 /* Aurora/Core/Utilities/ModelContainerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A1A1A1A1A1A1A1A1A1A1A1 /* Aurora/Core/Utilities/ModelContainerHelper.swift */; };
 		D2C9DAF12F61A8BD00867A47 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2C9DAF02F61A8BD00867A47 /* WidgetKit.framework */; };
 		D2C9DAF32F61A8BD00867A47 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2C9DAF22F61A8BD00867A47 /* SwiftUI.framework */; };
 		D2C9DB042F61A8BF00867A47 /* AuroraWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D2C9DAEE2F61A8BD00867A47 /* AuroraWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		B1B1B1B1B1B1B1B1B1B1B1B1 /* Aurora/Core/Utilities/ModelContainerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A1A1A1A1A1A1A1A1A1A1A1 /* Aurora/Core/Utilities/ModelContainerHelper.swift */; };
-
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,14 +60,13 @@
 		777777777772222222222222 /* Aurora/Core/Models/JournalModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Aurora/Core/Models/JournalModels.swift; sourceTree = "<group>"; };
 		777777777773333333333333 /* Aurora/Core/Design/Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Aurora/Core/Design/Theme.swift; sourceTree = "<group>"; };
 		777777777774444444444444 /* Aurora/Core/Models/SmartListType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Aurora/Core/Models/SmartListType.swift; sourceTree = "<group>"; };
+		A1A1A1A1A1A1A1A1A1A1A1A1 /* Aurora/Core/Utilities/ModelContainerHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Aurora/Core/Utilities/ModelContainerHelper.swift; sourceTree = "<group>"; };
 		D2560AA82EDE64A40004B219 /* Aurora.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Aurora.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2BD263F2EE086730008464D /* AuroraTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AuroraTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2BD26402EE086730008464D /* AuroraUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AuroraUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2C9DAEE2F61A8BD00867A47 /* AuroraWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AuroraWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2C9DAF02F61A8BD00867A47 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		D2C9DAF22F61A8BD00867A47 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
-		A1A1A1A1A1A1A1A1A1A1A1A1 /* Aurora/Core/Utilities/ModelContainerHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Aurora/Core/Utilities/ModelContainerHelper.swift; sourceTree = "<group>"; };
-
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -183,9 +181,9 @@
 				777777777772222222222222 /* Aurora/Core/Models/JournalModels.swift */,
 				777777777773333333333333 /* Aurora/Core/Design/Theme.swift */,
 				A1A1A1A1A1A1A1A1A1A1A1A1 /* Aurora/Core/Utilities/ModelContainerHelper.swift */,
+				777777777774444444444444 /* Aurora/Core/Models/SmartListType.swift */,
 			);
 			name = "Recovered References";
-
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -283,7 +281,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2610;
-				LastUpgradeCheck = 2610;
+				LastUpgradeCheck = 2660;
 				TargetAttributes = {
 					D26D7C262EDE4C1D00B0101A = {
 						CreatedOnToolsVersion = 26.1.1;
@@ -387,7 +385,6 @@
 				B1B1B1B1B1B1B1B1B1B1B1B1 /* Aurora/Core/Utilities/ModelContainerHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-
 		};
 /* End PBXSourcesBuildPhase section */
 
@@ -469,6 +466,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -526,6 +524,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -553,6 +552,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -570,7 +570,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -596,6 +596,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -613,7 +614,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -664,6 +665,7 @@
 		D26D7C512EDE4C2200B0101A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = RP6JRXYV7V;
@@ -684,6 +686,7 @@
 		D26D7C522EDE4C2200B0101A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = RP6JRXYV7V;

@@ -206,3 +206,10 @@ struct CategoryTasksView: View {
     }
   }
 }
+
+#Preview {
+  PreviewContainer {
+    CategoryTasksView(filterType: .smartList(.today))
+  }
+}
+

@@ -48,3 +48,8 @@ struct CameraPicker: UIViewControllerRepresentable {
     }
   }
 }
+
+#Preview {
+  CameraPicker(onImageCaptured: { _ in })
+}
+

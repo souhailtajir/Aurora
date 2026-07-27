@@ -351,3 +351,10 @@ struct TasksView: View {
     taskStore.tasks.filter { $0.category?.id == category.id && !$0.isCompleted }.count
   }
 }
+
+#Preview {
+  PreviewContainer {
+    TasksView()
+  }
+}
+

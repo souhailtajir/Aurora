@@ -44,3 +44,12 @@ struct CategoryCard: View {
     .clipShape(RoundedRectangle(cornerRadius: 24))
   }
 }
+
+#Preview {
+  HStack(spacing: 12) {
+    CategoryCard(icon: "briefcase.fill", title: "Work", count: 5, color: Color(hex: "66B3FF"))
+    CategoryCard(icon: "person.fill", title: "Personal", count: 3, color: Color(hex: "B366F3"))
+  }
+  .padding()
+  .preferredColorScheme(.dark)
+}
