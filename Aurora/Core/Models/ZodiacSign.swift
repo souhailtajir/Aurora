@@ -40,7 +40,7 @@ enum ZodiacSign: String, CaseIterable, Codable {
     }
     
     /// Calculate zodiac sign from birth date
-    static func from(birthDate: Date) -> ZodiacSign {
+    nonisolated static func from(birthDate: Date) -> ZodiacSign {
         let calendar = Calendar.current
         let month = calendar.component(.month, from: birthDate)
         let day = calendar.component(.day, from: birthDate)
@@ -94,7 +94,7 @@ enum ZodiacSign: String, CaseIterable, Codable {
     }
 }
 
-enum Planet: String, CaseIterable, Codable {
+nonisolated enum Planet: String, CaseIterable, Codable {
     case sun = "Sun"
     case moon = "Moon"
     case mercury = "Mercury"

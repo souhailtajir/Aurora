@@ -22,7 +22,6 @@ struct EntryEditorView: View {
 
   // Toolbar state
   @State private var showCamera = false
-  @State private var showSuggestions = false
   @State private var showMagicAlert = false
   @State private var locationService = LocationService()
   @State private var isLoadingLocation = false
@@ -85,16 +84,6 @@ struct EntryEditorView: View {
       }
       .ignoresSafeArea()
     }
-    .sheet(isPresented: $showSuggestions) {
-      JournalSuggestionsSheet { prompt in
-        if entryBody.isEmpty {
-          entryBody = prompt
-        } else {
-          entryBody += "\n\n" + prompt
-        }
-        save()
-      }
-    }
     .alert("Writing Tools", isPresented: $showMagicAlert) {
       Button("OK", role: .cancel) {}
     } message: {
@@ -108,15 +97,6 @@ struct EntryEditorView: View {
 
   private var bottomToolbar: some View {
     HStack(spacing: 28) {
-      // Journaling suggestions
-      Button {
-        showSuggestions = true
-      } label: {
-        Image(systemName: "sparkles")
-          .font(.system(size: 22))
-          .foregroundStyle(Theme.tint)
-      }
-
       // Photo library picker
       PhotosPicker(selection: $selectedPhoto, matching: .images) {
         Image(systemName: "photo.on.rectangle")

@@ -76,11 +76,18 @@ class AlarmService {
       systemImageName: "moon.zzz.fill"
     )
 
-    let alert = AlarmPresentation.Alert(
-      title: LocalizedStringResource(stringLiteral: task.title),
-      secondaryButton: snoozeButton,
-      secondaryButtonBehavior: .countdown
-    )
+    let alert: AlarmPresentation.Alert
+    if #available(iOS 26.1, *) {
+      alert = AlarmPresentation.Alert(
+        title: LocalizedStringResource(stringLiteral: task.title),
+        secondaryButton: snoozeButton,
+        secondaryButtonBehavior: .countdown
+      )
+    } else {
+      alert = AlarmPresentation.Alert(
+        title: LocalizedStringResource(stringLiteral: task.title)
+      )
+    }
 
     let presentation = AlarmPresentation(alert: alert)
 

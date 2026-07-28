@@ -2,8 +2,6 @@
 //  HomeView.swift
 //  Aurora
 //
-//  Created by souhail on 12/1/25.
-//
 
 import SwiftUI
 
@@ -48,11 +46,6 @@ struct HomeView: View {
     }.count
   }
 
-  private var flaggedCount: Int { taskStore.tasks.filter { $0.isFlagged && !$0.isCompleted }.count }
-  private var workCount: Int {
-    taskStore.tasks.filter { $0.category?.name == "Work" && !$0.isCompleted }.count
-  }
-
   private func getCount(for listType: SmartListType) -> Int {
     switch listType {
     case .today:
@@ -75,48 +68,6 @@ struct HomeView: View {
     taskStore.tasks.filter { $0.category?.id == category.id && !$0.isCompleted }.count
   }
 
-  private var pinnedCardsSection: some View {
-    // Build ordered list of pinned items (respecting user's ordering)
-    var pinnedItems: [PinnedCardItem] = []
-
-    // Add smart lists in their stored order
-    
-    for listType in taskStore.pinnedHomeSmartLists {
-      pinnedItems.append(.smartList(listType))
-    }
-
-
-    for categoryId in taskStore.pinnedHomeCategoryIds {
-      if let category = taskStore.categories.first(where: { $0.id == categoryId }) {
-        pinnedItems.append(.category(category))
-      }
-    }
-
-    // Limit to 2 cards max
-    let cardsToShow = Array(pinnedItems.prefix(2))
-
-    return Group {
-      if !cardsToShow.isEmpty {
-        HStack(spacing: 12) {
-          ForEach(cardsToShow) { item in
-            switch item {
-            case .smartList(let listType):
-              SmartListCard(listType: listType, count: getCount(for: listType)) {
-                navigationPath.append(CategoryTasksView.CategoryFilter.smartList(listType))
-              }
-            case .category(let category):
-              CategorySmartCard(category: category, count: getCount(for: category)) {
-                navigationPath.append(CategoryTasksView.CategoryFilter.category(category))
-              }
-            }
-          }
-        }
-        .padding(.horizontal, 16)
-        .padding(.top, 4)
-      }
-    }
-  }
-
   var body: some View {
     NavigationStack(path: $navigationPath) {
       ScrollView(showsIndicators: false) {
@@ -125,10 +76,8 @@ struct HomeView: View {
             searchResultsView
           } else {
             celestialSection
-            dailyProgressCard.padding(.top, 4)
-
+            dailyProgressCard
             pinnedCardsSection
-
             todaysAgendaSection
           }
         }
@@ -148,7 +97,7 @@ struct HomeView: View {
       .toolbar {
         ToolbarItemGroup(placement: .topBarTrailing) {
           Button("Search", systemImage: "magnifyingglass") {
-            withAnimation {
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
               isSearching = true
             }
           }
@@ -159,6 +108,7 @@ struct HomeView: View {
             showingPinnedCards = true
           }
         }
+
         ToolbarSpacer(.fixed, placement: .topBarTrailing)
 
         ToolbarItem(placement: .topBarTrailing) {
@@ -200,22 +150,199 @@ struct HomeView: View {
     }
   }
 
+  // MARK: - Celestial Section
+
+  private var celestialSection: some View {
+    VStack(spacing: 16) {
+      switch userProfileStore.profile.celestialDisplayMode {
+      case .zodiacPlanet:
+        PlanetSceneView(planet: userProfileStore.profile.rulingPlanet)
+          .frame(height: 190)
+      case .moonPhase:
+        MoonPhaseVisualizationView(moonInfo: MoonPhase.getInfo())
+          .frame(height: 190)
+      }
+
+      VStack(spacing: 4) {
+        Text(currentGreeting)
+          .font(.system(size: 28, weight: .bold, design: .rounded))
+          .foregroundStyle(
+            LinearGradient(
+              colors: [Theme.primary, Theme.secondary],
+              startPoint: .leading,
+              endPoint: .trailing
+            )
+          )
+
+        Text(formattedDate)
+          .font(.system(size: 15, weight: .medium))
+          .foregroundStyle(.secondary)
+      }
+    }
+    .padding(.vertical, 8)
+  }
+
+  // MARK: - Daily Progress Card
+
+  private var dailyProgressCard: some View {
+    let percentage = totalTodayTasks > 0 ? (completedTasksCount * 100) / totalTodayTasks : 0
+
+    return VStack(alignment: .leading, spacing: 12) {
+      HStack {
+        Text("Daily Progress")
+          .font(.system(size: 15, weight: .semibold))
+          .foregroundStyle(.secondary)
+
+        Spacer()
+
+        Text("\(completedTasksCount)/\(max(totalTodayTasks, 1))")
+          .font(.system(size: 15, weight: .bold, design: .rounded))
+          .foregroundStyle(Theme.primary)
+      }
+
+      GeometryReader { geo in
+        ZStack(alignment: .leading) {
+          Capsule()
+            .fill(.tertiary.opacity(0.3))
+            .frame(height: 8)
+
+          Capsule()
+            .fill(
+              LinearGradient(
+                colors: [Theme.primary, Theme.secondary],
+                startPoint: .leading,
+                endPoint: .trailing
+              )
+            )
+            .frame(
+              width: geo.size.width * CGFloat(completedTasksCount) / CGFloat(max(totalTodayTasks, 1)),
+              height: 8
+            )
+            .animation(.spring(response: 0.5, dampingFraction: 0.75), value: completedTasksCount)
+        }
+      }
+      .frame(height: 8)
+
+      Text("\(percentage)% of today's tasks completed")
+        .font(.system(size: 13, weight: .medium))
+        .foregroundStyle(.secondary)
+    }
+    .padding(16)
+    .background {
+      RoundedRectangle(cornerRadius: 20, style: .continuous)
+        .glassEffect(.regular)
+    }
+    .padding(.horizontal, 16)
+  }
+
+  // MARK: - Pinned Cards Section
+
+  private var pinnedCardsSection: some View {
+    var pinnedItems: [PinnedCardItem] = []
+
+    for listType in taskStore.pinnedHomeSmartLists {
+      pinnedItems.append(.smartList(listType))
+    }
+
+    for categoryId in taskStore.pinnedHomeCategoryIds {
+      if let category = taskStore.categories.first(where: { $0.id == categoryId }) {
+        pinnedItems.append(.category(category))
+      }
+    }
+
+    let cardsToShow = Array(pinnedItems.prefix(2))
+
+    return Group {
+      if !cardsToShow.isEmpty {
+        HStack(spacing: 12) {
+          ForEach(cardsToShow) { item in
+            switch item {
+            case .smartList(let listType):
+              SmartListCard(listType: listType, count: getCount(for: listType)) {
+                navigationPath.append(CategoryTasksView.CategoryFilter.smartList(listType))
+              }
+            case .category(let category):
+              CategorySmartCard(category: category, count: getCount(for: category)) {
+                navigationPath.append(CategoryTasksView.CategoryFilter.category(category))
+              }
+            }
+          }
+        }
+        .padding(.horizontal, 16)
+      }
+    }
+  }
+
+  // MARK: - Today's Agenda Section
+
+  private var todaysAgendaSection: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      Button {
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+          agendaExpanded.toggle()
+        }
+      } label: {
+        HStack {
+          Text("Today's Agenda")
+            .font(.system(size: 22, weight: .bold))
+            .foregroundStyle(.primary)
+
+          Image(systemName: agendaExpanded ? "chevron.down" : "chevron.right")
+            .font(.system(size: 14, weight: .semibold))
+            .foregroundStyle(.secondary)
+
+          Spacer()
+        }
+        .padding(.horizontal, 4)
+      }
+      .buttonStyle(.plain)
+      .padding(.horizontal, 16)
+
+      if agendaExpanded {
+        if todaysTasks.isEmpty {
+          VStack(spacing: 10) {
+            Image(systemName: "checkmark.circle.fill")
+              .font(.system(size: 38))
+              .foregroundStyle(Theme.primary.opacity(0.7))
+
+            Text("All clear for today!")
+              .font(.system(size: 15, weight: .medium))
+              .foregroundStyle(.secondary)
+          }
+          .frame(maxWidth: .infinity)
+          .padding(.vertical, 32)
+        } else {
+          VStack(spacing: 8) {
+            ForEach(todaysTasks) { task in
+              EditableTaskRow(
+                task: task,
+                editingTaskId: $editingTaskId,
+                focusedTaskId: $focusedTaskId,
+                onInfoTap: {
+                  selectedTaskForDetails = task
+                }
+              )
+            }
+          }
+          .padding(.horizontal, 16)
+          .transition(.opacity.combined(with: .move(edge: .top)))
+        }
+      }
+    }
+  }
+
   // MARK: - Search Results
 
   private var searchResultsView: some View {
     VStack(spacing: 8) {
       if searchResults.isEmpty {
-        // Empty state when no results found
         VStack(spacing: 12) {
           Image(systemName: "magnifyingglass")
             .font(.system(size: 36))
             .foregroundStyle(.secondary)
-          Text("No results found")
-            .font(.system(size: 15))
+          Text("No matching tasks found")
+            .font(.system(size: 15, weight: .medium))
             .foregroundStyle(.secondary)
-          Text("Try a different search term")
-            .font(.system(size: 13))
-            .foregroundStyle(.tertiary)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 60)
@@ -256,86 +383,11 @@ struct HomeView: View {
     }
   }
 
-  // MARK: - Celestial Section (Planet or Moon based on settings)
-
-  private var celestialSection: some View {
-    VStack(spacing: 16) {
-      // Planet/Moon display based on user preference
-      switch userProfileStore.profile.celestialDisplayMode {
-      case .zodiacPlanet:
-        PlanetSceneView(planet: userProfileStore.profile.rulingPlanet)
-          .frame(height: 200)
-      case .moonPhase:
-        MoonPhaseVisualizationView(moonInfo: MoonPhase.getInfo())
-          .frame(height: 200)
-      }
-
-      // Greeting and date
-      VStack(spacing: 6) {
-        Text(currentGreeting)
-          .font(.system(size: 28, weight: .bold))
-          .foregroundStyle(Theme.primary)
-
-        Text(formattedDate)
-          .font(.system(size: 15))
-          .foregroundStyle(Theme.secondary)
-      }
-    }
-    .frame(maxWidth: .infinity)
-    .padding(.vertical, 16)
-  }
-
-  private var dailyProgressCard: some View {
-    VStack(alignment: .leading, spacing: 12) {
-      HStack(alignment: .top) {
-        Text("Daily Progress")
-          .font(.system(size: 16, weight: .semibold))
-          .foregroundStyle(Theme.secondary)
-          .padding(.horizontal, 4)
-        Spacer()
-        Text("\(completedTasksCount)/\(max(totalTodayTasks, 1))")
-          .font(.system(size: 16, weight: .bold))
-          .foregroundStyle(Theme.secondary)
-          .padding(.horizontal, 4)
-      }
-
-      GeometryReader { geometry in
-        ZStack(alignment: .leading) {
-          RoundedRectangle(cornerRadius: 8)
-            .fill(.gray.opacity(0.2))
-            .frame(height: 8)
-          RoundedRectangle(cornerRadius: 8)
-            .fill(Theme.secondary)
-            .frame(
-              width: geometry.size.width * CGFloat(completedTasksCount)
-                / CGFloat(max(totalTodayTasks, 1)), height: 8
-            )
-            .animation(.spring(response: 0.5, dampingFraction: 0.7), value: completedTasksCount)
-        }
-      }
-      .frame(height: 8)
-      .padding(.horizontal, 4)
-
-      let percentage = totalTodayTasks > 0 ? (completedTasksCount * 100) / totalTodayTasks : 0
-      Text("\(percentage)% of your daily tasks done")
-        .font(.system(size: 13))
-        .foregroundStyle(.gray)
-        .padding(.horizontal, 4)
-    }
-    .padding(16)
-    .glassEffect(.clear)
-    .padding(.horizontal, 16)
-  }
-
   private var currentGreeting: String {
     let hour = Calendar.current.component(.hour, from: Date())
-    if hour < 12 {
-      return "Good Morning"
-    } else if hour < 17 {
-      return "Good Afternoon"
-    } else {
-      return "Good Evening"
-    }
+    if hour < 12 { return "Good Morning" }
+    if hour < 17 { return "Good Afternoon" }
+    return "Good Evening"
   }
 
   private var formattedDate: String {
@@ -343,61 +395,4 @@ struct HomeView: View {
     formatter.dateFormat = "EEEE, MMMM d"
     return formatter.string(from: Date())
   }
-
-  private var todaysAgendaSection: some View {
-    VStack(alignment: .leading, spacing: 12) {
-      Button {
-        withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
-          agendaExpanded.toggle()
-        }
-      } label: {
-        HStack {
-          Text("Today's Agenda")
-            .font(.system(size: 22, weight: .bold))
-            .foregroundStyle(.primary)
-
-          Image(systemName: agendaExpanded ? "chevron.down" : "chevron.right")
-            .font(.system(size: 14, weight: .semibold))
-            .foregroundStyle(.secondary)
-            .contentTransition(.symbolEffect(.replace))
-
-          Spacer()
-        }
-        .padding(.horizontal, 4)
-      }
-      .buttonStyle(.plain)
-      .padding(.horizontal, 16)
-
-      if agendaExpanded {
-        if todaysTasks.isEmpty {
-          VStack(spacing: 12) {
-            Image(systemName: "checkmark.circle")
-              .font(.system(size: 36))
-              .foregroundStyle(.secondary)
-            Text("No tasks for today")
-              .font(.system(size: 15))
-              .foregroundStyle(.secondary)
-          }
-          .frame(maxWidth: .infinity)
-          .padding(.vertical, 32)
-        } else {
-          VStack(spacing: 8) {
-            ForEach(todaysTasks) { task in
-              EditableTaskRow(
-                task: task,
-                editingTaskId: $editingTaskId,
-                focusedTaskId: $focusedTaskId,
-                onInfoTap: {
-                  selectedTaskForDetails = task
-                }
-              )
-            }
-          }
-          .padding(.horizontal, 16)
-          .transition(.opacity.combined(with: .move(edge: .top)))
-        }
-      }
-    }
-  }
-
 }

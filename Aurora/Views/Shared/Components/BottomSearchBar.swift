@@ -66,11 +66,10 @@ struct BottomSearchBar: View {
   }
 
   private func dismissSearch() {
-    // Dismiss keyboard first
     UIApplication.shared.sendAction(
       #selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
 
-    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
       text = ""
       isSearching = false
       isFocused = false

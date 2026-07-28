@@ -6,11 +6,12 @@
 //
 
 import SceneKit
+import UIKit
 
-class PlanetNode: SCNNode {
+nonisolated final class PlanetNode: SCNNode {
     private let planet: Planet
     
-    init(planet: Planet, radius: CGFloat = 1.0) {
+    nonisolated init(planet: Planet, radius: CGFloat = 1.0) {
         self.planet = planet
         super.init()
         
@@ -25,7 +26,8 @@ class PlanetNode: SCNNode {
         startRotation()
     }
     
-    required init?(coder: NSCoder) {
+    @available(*, unavailable)
+    nonisolated required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     

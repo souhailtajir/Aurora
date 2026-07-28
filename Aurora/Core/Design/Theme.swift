@@ -2,49 +2,26 @@
 //  Theme.swift
 //  Aurora
 //
-//  Created by souhail on 12/1/25.
-//
 
 import SwiftUI
 
 enum Theme {
-  static let primary = Color(red: 0.4, green: 0.35, blue: 0.9)
-  static let secondary = Color(red: 0.5, green: 0.4, blue: 0.95)
-  static let tint = Color(red: 0.4, green: 0.35, blue: 0.9)  // Mapped to primary for consistency
+  static let primary = Color(red: 0.48, green: 0.38, blue: 0.95)
+  static let secondary = Color(red: 0.62, green: 0.48, blue: 0.98)
+  static let tint = Color(red: 0.48, green: 0.38, blue: 0.95)
 
-  // Light mode gradients
+  // Background Colors
   static let backgroundTop = Color(red: 0.85, green: 0.8, blue: 0.95)
   static let backgroundBottom = Color(red: 0.9, green: 0.85, blue: 0.95)
 
-  // Dark mode gradients
-  static let darkBackgroundTop = Color(red: 0.12, green: 0.1, blue: 0.2)
-  static let darkBackgroundBottom = Color(red: 0.18, green: 0.15, blue: 0.25)
-
-  // Insights Card Gradients (Deep Purple/Indigo)
-  static let insightsGradientTop = Color(hex: "56559C")  // Muted Indigo
-  static let insightsGradientBottom = Color(hex: "3F3E7A")  // Deep Purple
-
-  // Task Row Background
-  static let taskRowBackground = Color(red: 0.88, green: 0.84, blue: 0.95)
-
-  // Filter Chip Colors
-  static let chipFlagged = Color(red: 1.0, green: 0.5, blue: 0.3)  // Orange
-  static let chipWork = Color(red: 0.4, green: 0.7, blue: 1.0)  // Blue
-  static let chipPersonal = Color(red: 0.7, green: 0.4, blue: 0.95)  // Purple
-  static let chipShopping = Color(red: 0.4, green: 0.85, blue: 0.5)  // Green
-
-  // Category Colors
-  static let flagColor = Color(red: 1.0, green: 0.6, blue: 0.0)
-  static let workColor = Color(red: 0.4, green: 0.7, blue: 1.0)
-  static let personalColor = Color(red: 0.7, green: 0.4, blue: 0.95)
-  static let shoppingColor = Color(red: 0.4, green: 0.85, blue: 0.5)
-  static let healthColor = Color(red: 1.0, green: 0.4, blue: 0.5)
+  // Gradients & Accents
+  static let insightsGradientTop = Color(hex: "6252C4")
+  static let insightsGradientBottom = Color(hex: "3B3885")
 
   static var auroraBackground: some View {
     AuroraBackgroundView()
   }
 
-  // Helper function to get category color
   static func categoryColor(for category: TaskCategory) -> Color {
     Color(hex: category.colorHex)
   }
@@ -55,19 +32,16 @@ extension Color {
     let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
     var int: UInt64 = 0
     Scanner(string: hex).scanHexInt64(&int)
-    let a: UInt64
-    let r: UInt64
-    let g: UInt64
-    let b: UInt64
+    let a, r, g, b: UInt64
     switch hex.count {
-    case 3:  // RGB (12-bit)
+    case 3:
       (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-    case 6:  // RGB (24-bit)
+    case 6:
       (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-    case 8:  // ARGB (32-bit)
+    case 8:
       (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
     default:
-      (a, r, g, b) = (1, 1, 1, 0)
+      (a, r, g, b) = (255, 255, 255, 255)
     }
 
     self.init(
@@ -81,44 +55,44 @@ extension Color {
 }
 
 extension View {
-  @ViewBuilder
-
   func auroraBackground() -> some View {
     background(AuroraBackgroundView())
   }
 }
 
 struct AuroraBackgroundView: View {
-  @Environment(\.colorScheme) var colorScheme
+  @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     ZStack {
       if colorScheme == .dark {
-        // Dark Mode: Deep black with purple aurora gradient
-        Color.black
+        Color(hex: "0B0A12")
 
-        LinearGradient(
-          colors: [
-            Color(hex: "5B50A0").opacity(0.4),  // Purple
-            Color(hex: "2D1B69").opacity(0.2),  // Deep indigo
-            .clear,
-          ],
-          startPoint: .topLeading,
-          endPoint: .bottomTrailing
-        )
+        Circle()
+          .fill(Theme.primary.opacity(0.18))
+          .frame(width: 320, height: 320)
+          .blur(radius: 90)
+          .offset(x: -120, y: -200)
+
+        Circle()
+          .fill(Theme.secondary.opacity(0.15))
+          .frame(width: 280, height: 280)
+          .blur(radius: 80)
+          .offset(x: 140, y: 180)
       } else {
-        // Light Mode: Soft lavender with subtle purple gradient
-        Color(red: 0.96, green: 0.95, blue: 0.98)  // Very light lavender base
+        Color(hex: "F7F6FA")
 
-        LinearGradient(
-          colors: [
-            Color(hex: "E8D4FF").opacity(0.5),  // Soft purple
-            Color(hex: "D4C4FF").opacity(0.3),  // Light lavender
-            .clear,
-          ],
-          startPoint: .topLeading,
-          endPoint: .bottomTrailing
-        )
+        Circle()
+          .fill(Color(hex: "E3D7FF").opacity(0.5))
+          .frame(width: 340, height: 340)
+          .blur(radius: 90)
+          .offset(x: -100, y: -180)
+
+        Circle()
+          .fill(Color(hex: "D3C2FF").opacity(0.35))
+          .frame(width: 300, height: 300)
+          .blur(radius: 80)
+          .offset(x: 120, y: 160)
       }
     }
     .ignoresSafeArea()
