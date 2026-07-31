@@ -79,7 +79,7 @@ struct SettingsView: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 14)
           }
-          .glassEffect(.clear)
+          .glassEffect()
         }
 
         // Sounds & Haptics
