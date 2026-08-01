@@ -85,6 +85,9 @@
 			membershipExceptions = (
 				Info.plist,
 			);
+			platformFiltersByRelativePath = {
+				Views/Journal/Components/JournalStreakCard.swift = (ios, );
+			};
 			target = D26D7C262EDE4C1D00B0101A /* Aurora */;
 		};
 		D2C9DB092F61A8BF00867A47 /* Exceptions for "AuroraWidget" folder in "AuroraWidgetExtension" target */ = {
