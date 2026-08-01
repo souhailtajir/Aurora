@@ -230,7 +230,7 @@ struct HomeView: View {
     .padding(16)
     .background {
       RoundedRectangle(cornerRadius: 20, style: .continuous)
-        .glassEffect(.regular)
+            .glassEffect(.clear)
     }
     .padding(.horizontal, 16)
   }
