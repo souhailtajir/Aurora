@@ -5,6 +5,7 @@
 
 import UIKit
 
+@MainActor
 @Observable
 final class HapticService {
   static let shared = HapticService()

@@ -11,6 +11,7 @@ struct AllEntriesView: View {
   @State private var searchText = ""
   @State private var isSearching = false
   @State private var selectedEntry: JournalEntry?
+  @Environment(\.horizontalSizeClass) private var sizeClass
 
   private var entries: [JournalEntry] {
     let sorted = taskStore.journalEntries.sorted { $0.date > $1.date }
@@ -39,29 +40,29 @@ struct AllEntriesView: View {
   var body: some View {
     List {
       // Header
-      VStack(alignment: .leading, spacing: 4) {
+      VStack(alignment: .leading, spacing: LayoutTokens.Spacing.xs) {
         Text("All Entries")
-          .font(.system(size: 28, weight: .bold))
+          .font(.system(size: LayoutTokens.Typography.largeTitle, weight: .bold))
         Text("\(taskStore.journalEntries.count) entries")
-          .font(.system(size: 14))
+          .font(.system(size: LayoutTokens.Typography.subheadline))
           .foregroundStyle(.secondary)
       }
-      .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 8, trailing: 16))
+      .listRowInsets(EdgeInsets(top: LayoutTokens.Spacing.lg, leading: LayoutTokens.Padding.screenHorizontal(for: sizeClass), bottom: LayoutTokens.Spacing.sm, trailing: LayoutTokens.Padding.screenHorizontal(for: sizeClass)))
       .listRowBackground(Color.clear)
       .listRowSeparator(.hidden)
 
       // Empty state or entries
       if entries.isEmpty {
-        VStack(spacing: 12) {
+        VStack(spacing: LayoutTokens.Spacing.md) {
           Image(systemName: "book.closed")
-            .font(.system(size: 36))
+            .font(.system(size: LayoutTokens.Typography.emptyStateIcon))
             .foregroundStyle(.secondary.opacity(0.5))
           Text("No entries yet")
-            .font(.system(size: 15))
+            .font(.system(size: LayoutTokens.Typography.callout))
             .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 60)
+        .padding(.vertical, LayoutTokens.Spacing.xxl * 3)
         .listRowInsets(EdgeInsets())
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
@@ -73,13 +74,13 @@ struct AllEntriesView: View {
               JournalEntryRow(entry: entry) {
                 selectedEntry = entry
               }
-              .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+              .listRowInsets(LayoutTokens.listRowInsets(vertical: LayoutTokens.Spacing.xs, for: sizeClass))
               .listRowBackground(Color.clear)
               .listRowSeparator(.hidden)
             }
           } header: {
             Text(month)
-              .font(.system(size: 14, weight: .semibold))
+              .font(.system(size: LayoutTokens.Typography.subheadline, weight: .semibold))
               .foregroundStyle(Theme.tint)
               .textCase(nil)
           }

@@ -10,6 +10,7 @@ struct BirthDatePickerView: View {
   let userProfileStore: UserProfileStore
   @Binding var isPresented: Bool
   @State private var selectedDate: Date
+  @Environment(\.horizontalSizeClass) private var sizeClass
 
   init(userProfileStore: UserProfileStore, isPresented: Binding<Bool>) {
     self.userProfileStore = userProfileStore
@@ -28,30 +29,30 @@ struct BirthDatePickerView: View {
         Theme.auroraBackground
           .ignoresSafeArea()
 
-        VStack(spacing: 20) {
+        VStack(spacing: LayoutTokens.Spacing.xl) {
           // Preview Card
-          VStack(spacing: 6) {
+          VStack(spacing: LayoutTokens.Spacing.sm) {
             Text(computedZodiac.symbol)
               .font(.system(size: 64))
               .padding(.bottom, 6)
 
             Text(computedZodiac.rawValue)
-              .font(.system(size: 26, weight: .bold))
+              .font(.system(size: LayoutTokens.Typography.largeNumber, weight: .bold))
               .foregroundStyle(Theme.secondary)
 
             Text("Ruled by \(computedZodiac.rulingPlanet.displayName)")
-              .font(.system(size: 16, weight: .medium))
+              .font(.system(size: LayoutTokens.Typography.body, weight: .medium))
               .foregroundStyle(.secondary)
           }
           .frame(maxWidth: .infinity)
-          .padding(.vertical, 32)
+          .padding(.vertical, LayoutTokens.Spacing.xxl)
           .glassEffect(.clear)
-          .padding(.horizontal, 20)
+          .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
 
           // Date Picker Card
-          VStack(spacing: 16) {
+          VStack(spacing: LayoutTokens.Spacing.lg) {
             Text("When were you born?")
-              .font(.system(size: 17, weight: .semibold))
+              .font(.system(size: LayoutTokens.Typography.headline, weight: .semibold))
               .foregroundStyle(.primary)
               .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -64,13 +65,13 @@ struct BirthDatePickerView: View {
             .labelsHidden()
             .frame(height: 140)
           }
-          .padding(24)
+          .padding(LayoutTokens.Padding.cardHero(for: sizeClass))
           .glassEffect(.regular)
-          .padding(.horizontal, 20)
+          .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
 
           Spacer()
         }
-        .padding(.top, 20)
+        .padding(.top, LayoutTokens.Padding.sectionTop)
       }
       .navigationTitle("Birth Date")
       .navigationBarTitleDisplayMode(.inline)

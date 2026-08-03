@@ -19,6 +19,7 @@ struct EntryEditorView: View {
   @State private var selectedPhoto: PhotosPickerItem?
   @FocusState private var titleFocused: Bool
   @FocusState private var bodyFocused: Bool
+  @Environment(\.horizontalSizeClass) private var sizeClass
 
   // Toolbar state
   @State private var showCamera = false
@@ -57,7 +58,7 @@ struct EntryEditorView: View {
           dismiss()
         } label: {
           Image(systemName: "chevron.left")
-            .font(.system(size: 16, weight: .semibold))
+            .font(.system(size: LayoutTokens.Typography.body, weight: .semibold))
         }
       }
 
@@ -66,7 +67,7 @@ struct EntryEditorView: View {
           dismiss()
         } label: {
           Image(systemName: "checkmark")
-            .font(.system(size: 16, weight: .bold))
+            .font(.system(size: LayoutTokens.Typography.body, weight: .bold))
         }
         .buttonStyle(.glassProminent)
         .tint(Theme.primary)
@@ -96,11 +97,11 @@ struct EntryEditorView: View {
   // MARK: - Bottom Toolbar
 
   private var bottomToolbar: some View {
-    HStack(spacing: 28) {
+    HStack(spacing: LayoutTokens.Spacing.xl) {
       // Photo library picker
       PhotosPicker(selection: $selectedPhoto, matching: .images) {
         Image(systemName: "photo.on.rectangle")
-          .font(.system(size: 22))
+          .font(.system(size: LayoutTokens.IconSize.lg))
           .foregroundStyle(Theme.tint)
       }
       .onChange(of: selectedPhoto) { _, newItem in
@@ -114,7 +115,7 @@ struct EntryEditorView: View {
         requestCameraAccess()
       } label: {
         Image(systemName: "camera")
-          .font(.system(size: 22))
+          .font(.system(size: LayoutTokens.IconSize.lg))
           .foregroundStyle(Theme.tint)
       }
 
@@ -123,7 +124,7 @@ struct EntryEditorView: View {
         toggleDictation()
       } label: {
         Image(systemName: isDictating ? "mic.fill" : "waveform")
-          .font(.system(size: 22))
+          .font(.system(size: LayoutTokens.IconSize.lg))
           .foregroundStyle(isDictating ? .red : Theme.tint)
           .symbolEffect(.pulse, isActive: isDictating)
       }
@@ -137,7 +138,7 @@ struct EntryEditorView: View {
             .tint(Theme.tint)
         } else {
           Image(systemName: entry?.locationName != nil ? "location.fill" : "location")
-            .font(.system(size: 22))
+            .font(.system(size: LayoutTokens.IconSize.lg))
             .foregroundStyle(entry?.locationName != nil ? Theme.primary : Theme.tint)
         }
       }
@@ -147,28 +148,28 @@ struct EntryEditorView: View {
         showMagicAlert = true
       } label: {
         Image(systemName: "wand.and.stars")
-          .font(.system(size: 22))
+          .font(.system(size: LayoutTokens.IconSize.lg))
           .foregroundStyle(Theme.tint)
       }
     }
-    .padding(.horizontal, 20)
-    .padding(.vertical, 10)
+    .padding(.horizontal, LayoutTokens.Spacing.xl)
+    .padding(.vertical, LayoutTokens.Spacing.sm + 2)
     .background {
       Capsule()
         .glassEffect(.clear)
     }
-    .padding(.horizontal, 24)
-    .padding(.bottom, 8)
+    .padding(.horizontal, LayoutTokens.Spacing.xxl)
+    .padding(.bottom, LayoutTokens.Spacing.sm)
   }
 
   // MARK: - Editor Content
 
   private var editorContent: some View {
     ScrollView(showsIndicators: false) {
-      VStack(alignment: .leading, spacing: 12) {
+      VStack(alignment: .leading, spacing: LayoutTokens.Spacing.md) {
         // Title field
         TextField("Title", text: $title)
-          .font(.system(size: 22, weight: .medium))
+          .font(.system(size: LayoutTokens.Typography.title2, weight: .medium))
           .foregroundStyle(.primary)
           .focused($titleFocused)
           .submitLabel(.next)
@@ -180,15 +181,15 @@ struct EntryEditorView: View {
 
         // Location badge
         if let locationName = entry?.locationName {
-          HStack(spacing: 6) {
+          HStack(spacing: LayoutTokens.Spacing.xs) {
             Image(systemName: "location.fill")
-              .font(.system(size: 12))
+              .font(.system(size: LayoutTokens.Typography.caption))
             Text(locationName)
-              .font(.system(size: 13))
+              .font(.system(size: LayoutTokens.Typography.footnote))
           }
           .foregroundStyle(Theme.primary)
-          .padding(.horizontal, 10)
-          .padding(.vertical, 6)
+          .padding(.horizontal, LayoutTokens.Spacing.sm + 2)
+          .padding(.vertical, LayoutTokens.Spacing.xs + 2)
           .background {
             Capsule()
               .fill(Theme.primary.opacity(0.15))
@@ -199,13 +200,13 @@ struct EntryEditorView: View {
         ZStack(alignment: .topLeading) {
           if entryBody.isEmpty {
             Text("Start writing...")
-              .font(.system(size: 17))
+              .font(.system(size: LayoutTokens.Typography.body + 1))
               .foregroundStyle(.secondary.opacity(0.5))
-              .padding(.top, 8)
+              .padding(.top, LayoutTokens.Spacing.sm)
           }
 
           TextEditor(text: $entryBody)
-            .font(.system(size: 17))
+            .font(.system(size: LayoutTokens.Typography.body + 1))
             .foregroundStyle(.primary)
             .scrollContentBackground(.hidden)
             .frame(minHeight: 300)
@@ -220,20 +221,20 @@ struct EntryEditorView: View {
 
         Spacer(minLength: 100)
       }
-      .padding(.horizontal, 20)
-      .padding(.top, 16)
+      .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
+      .padding(.top, LayoutTokens.Spacing.lg)
     }
   }
 
   // MARK: - Empty State
 
   private var emptyState: some View {
-    VStack(spacing: 16) {
+    VStack(spacing: LayoutTokens.Spacing.lg) {
       Image(systemName: "doc.questionmark")
-        .font(.system(size: 40))
+        .font(.system(size: LayoutTokens.Typography.emptyStateIcon + 4))
         .foregroundStyle(.secondary)
       Text("Entry not found")
-        .font(.system(size: 16))
+        .font(.system(size: LayoutTokens.Typography.body))
         .foregroundStyle(.secondary)
     }
   }
@@ -255,7 +256,7 @@ struct EntryEditorView: View {
               removeImage(at: index)
             } label: {
               Image(systemName: "xmark.circle.fill")
-                .font(.system(size: 18))
+                .font(.system(size: LayoutTokens.IconSize.md))
                 .symbolRenderingMode(.palette)
                 .foregroundStyle(.white, .black.opacity(0.5))
             }

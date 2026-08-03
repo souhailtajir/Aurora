@@ -12,6 +12,7 @@ struct DeletedEntriesView: View {
   @State private var isSearching = false
   @State private var isSelecting = false
   @State private var selectedEntries: Set<UUID> = []
+  @Environment(\.horizontalSizeClass) private var sizeClass
 
   private var filteredEntries: [JournalEntry] {
     if searchText.isEmpty {
@@ -29,37 +30,37 @@ struct DeletedEntriesView: View {
 
   var body: some View {
     ScrollView {
-      VStack(alignment: .leading, spacing: 16) {
+      VStack(alignment: .leading, spacing: LayoutTokens.Spacing.lg) {
         // Header
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: LayoutTokens.Spacing.xs) {
           Text("Recently Deleted")
-            .font(.system(size: 28, weight: .bold))
+            .font(.system(size: LayoutTokens.Typography.largeTitle, weight: .bold))
           Text("\(taskStore.deletedJournalEntries.count) entries")
-            .font(.system(size: 14))
+            .font(.system(size: LayoutTokens.Typography.subheadline))
             .foregroundStyle(.secondary)
         }
-        .padding(.top, 16)
+        .padding(.top, LayoutTokens.Spacing.lg)
 
         // Empty state or entries
         if taskStore.deletedJournalEntries.isEmpty {
-          VStack(spacing: 12) {
+          VStack(spacing: LayoutTokens.Spacing.md) {
             Image(systemName: "trash")
-              .font(.system(size: 36))
+              .font(.system(size: LayoutTokens.Typography.emptyStateIcon))
               .foregroundStyle(.secondary.opacity(0.5))
             Text("No deleted entries")
-              .font(.system(size: 15))
+              .font(.system(size: LayoutTokens.Typography.callout))
               .foregroundStyle(.secondary)
           }
           .frame(maxWidth: .infinity)
-          .padding(.vertical, 60)
+          .padding(.vertical, LayoutTokens.Spacing.xxl * 3)
         } else {
           ForEach(filteredEntries) { entry in
             deletedRowContent(entry)
           }
         }
       }
-      .padding(.horizontal, 16)
-      .padding(.bottom, 100)  // Space for bottom bar
+      .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
+      .padding(.bottom, LayoutTokens.Padding.scrollBottom)  // Space for bottom bar
     }
     .scrollIndicators(.hidden)
     .background(Color.clear.auroraBackground())
@@ -82,7 +83,7 @@ struct DeletedEntriesView: View {
             }
           } label: {
             Text(isSelecting ? (allSelected ? "Deselect All" : "Select All") : "Select")
-              .font(.system(size: 16, weight: .medium))
+              .font(.system(size: LayoutTokens.Typography.body, weight: .medium))
               .foregroundStyle(Theme.tint)
           }
         }
@@ -118,7 +119,7 @@ struct DeletedEntriesView: View {
   // MARK: - Bottom Action Bar
 
   private var bottomActionBar: some View {
-    HStack(spacing: 12) {
+    HStack(spacing: LayoutTokens.Spacing.md) {
       if isSelecting && !selectedEntries.isEmpty {
         // Selected items actions
         Button {
@@ -134,15 +135,15 @@ struct DeletedEntriesView: View {
             }
           }
         } label: {
-          HStack(spacing: 8) {
+          HStack(spacing: LayoutTokens.Spacing.sm) {
             Image(systemName: "arrow.uturn.backward")
             Text("Recover (\(selectedEntries.count))")
           }
-          .font(.system(size: 16, weight: .semibold))
+          .font(.system(size: LayoutTokens.Typography.body, weight: .semibold))
           .foregroundStyle(.white)
           .frame(maxWidth: .infinity)
-          .padding(.vertical, 14)
-          .background(Theme.tint, in: .rect(cornerRadius: 20))
+          .padding(.vertical, LayoutTokens.Padding.rowVertical)
+          .background(Theme.tint, in: .rect(cornerRadius: LayoutTokens.Radius.lg))
         }
 
         Button {
@@ -158,15 +159,15 @@ struct DeletedEntriesView: View {
             }
           }
         } label: {
-          HStack(spacing: 8) {
+          HStack(spacing: LayoutTokens.Spacing.sm) {
             Image(systemName: "trash")
             Text("Delete (\(selectedEntries.count))")
           }
-          .font(.system(size: 16, weight: .semibold))
+          .font(.system(size: LayoutTokens.Typography.body, weight: .semibold))
           .foregroundStyle(.white)
           .frame(maxWidth: .infinity)
-          .padding(.vertical, 14)
-          .background(.red, in: .rect(cornerRadius: 20))
+          .padding(.vertical, LayoutTokens.Padding.rowVertical)
+          .background(.red, in: .rect(cornerRadius: LayoutTokens.Radius.lg))
         }
       } else if isSelecting {
         // Selecting mode but nothing selected - show cancel
@@ -177,11 +178,11 @@ struct DeletedEntriesView: View {
           }
         } label: {
           Text("Cancel")
-            .font(.system(size: 16, weight: .semibold))
+            .font(.system(size: LayoutTokens.Typography.body, weight: .semibold))
             .foregroundStyle(Theme.tint)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .background(.ultraThinMaterial, in: .rect(cornerRadius: 20))
+            .padding(.vertical, LayoutTokens.Padding.rowVertical)
+            .background(.ultraThinMaterial, in: .rect(cornerRadius: LayoutTokens.Radius.lg))
         }
       } else {
         // Not selecting - show Recover All / Delete All
@@ -192,15 +193,15 @@ struct DeletedEntriesView: View {
             }
           }
         } label: {
-          HStack(spacing: 8) {
+          HStack(spacing: LayoutTokens.Spacing.sm) {
             Image(systemName: "arrow.uturn.backward")
             Text("Recover All")
           }
-          .font(.system(size: 16, weight: .semibold))
+          .font(.system(size: LayoutTokens.Typography.body, weight: .semibold))
           .foregroundStyle(.white)
           .frame(maxWidth: .infinity)
-          .padding(.vertical, 14)
-          .background(Theme.tint, in: .rect(cornerRadius: 20))
+          .padding(.vertical, LayoutTokens.Padding.rowVertical)
+          .background(Theme.tint, in: .rect(cornerRadius: LayoutTokens.Radius.lg))
         }
 
         Button {
@@ -210,22 +211,22 @@ struct DeletedEntriesView: View {
             }
           }
         } label: {
-          HStack(spacing: 8) {
+          HStack(spacing: LayoutTokens.Spacing.sm) {
             Image(systemName: "trash")
             Text("Delete All")
           }
-          .font(.system(size: 16, weight: .semibold))
+          .font(.system(size: LayoutTokens.Typography.body, weight: .semibold))
           .foregroundStyle(.white)
           .frame(maxWidth: .infinity)
-          .padding(.vertical, 14)
-          .background(.red, in: .rect(cornerRadius: 20))
+          .padding(.vertical, LayoutTokens.Padding.rowVertical)
+          .background(.red, in: .rect(cornerRadius: LayoutTokens.Radius.lg))
         }
       }
     }
-    .padding(12)
+    .padding(LayoutTokens.Spacing.md)
     .glassEffect(.clear, in: .capsule)
-    .padding(.horizontal, 16)
-    .padding(.bottom, 8)
+    .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
+    .padding(.bottom, LayoutTokens.Spacing.sm)
   }
 
   // MARK: - Row Content
@@ -244,16 +245,16 @@ struct DeletedEntriesView: View {
         }
       }
     } label: {
-      HStack(spacing: 12) {
-        VStack(alignment: .leading, spacing: 4) {
+      HStack(spacing: LayoutTokens.Spacing.md) {
+        VStack(alignment: .leading, spacing: LayoutTokens.Spacing.xs) {
           Text(entry.title.isEmpty ? "Untitled" : entry.title)
-            .font(.system(size: 16, weight: .medium))
+            .font(.system(size: LayoutTokens.Typography.body, weight: .medium))
             .foregroundStyle(.primary)
             .lineLimit(1)
 
           if let deletedAt = entry.deletedAt {
             Text("Deleted \(deletedAt.formatted(.relative(presentation: .named)))")
-              .font(.system(size: 13))
+              .font(.system(size: LayoutTokens.Typography.footnote))
               .foregroundStyle(.secondary)
           }
         }
@@ -264,17 +265,17 @@ struct DeletedEntriesView: View {
         if isSelecting {
           if selectedEntries.contains(entry.id) {
             Image(systemName: "checkmark.circle.fill")
-              .font(.system(size: 22))
+              .font(.system(size: LayoutTokens.IconSize.lg))
               .foregroundStyle(Theme.tint)
           } else {
             Image(systemName: "circle")
-              .font(.system(size: 22))
+              .font(.system(size: LayoutTokens.IconSize.lg))
               .foregroundStyle(.secondary.opacity(0.5))
           }
         }
       }
-      .padding(.horizontal, 16)
-      .padding(.vertical, 12)
+      .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
+      .padding(.vertical, LayoutTokens.Spacing.md)
       .contentShape(Rectangle())
     }
     .buttonStyle(.plain)

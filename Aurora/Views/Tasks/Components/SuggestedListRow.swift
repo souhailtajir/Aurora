@@ -13,28 +13,29 @@ struct SuggestedListRow: View {
   let title: String
   let subtitle: String
   let onAdd: () -> Void
+  @Environment(\.horizontalSizeClass) private var sizeClass
 
   var body: some View {
-    HStack(spacing: 12) {
+    HStack(spacing: LayoutTokens.Spacing.md) {
       // Icon with colored background
       ZStack {
         Circle()
           .fill(iconColor)
-          .frame(width: 36, height: 36)
+          .frame(width: LayoutTokens.CardHeight.suggestedIcon, height: LayoutTokens.CardHeight.suggestedIcon)
 
         Image(systemName: icon)
-          .font(.system(size: 16, weight: .semibold))
+          .font(.system(size: LayoutTokens.Typography.body, weight: .semibold))
           .foregroundStyle(.white)
       }
 
       // Title and subtitle
-      VStack(alignment: .leading, spacing: 2) {
+      VStack(alignment: .leading, spacing: LayoutTokens.Spacing.xs) {
         Text(title)
-          .font(.system(size: 16, weight: .medium))
+          .font(.system(size: LayoutTokens.Typography.body, weight: .medium))
           .foregroundStyle(.primary)
 
         Text(subtitle)
-          .font(.system(size: 13))
+          .font(.system(size: LayoutTokens.Typography.footnote))
           .foregroundStyle(.secondary)
       }
 
@@ -43,13 +44,13 @@ struct SuggestedListRow: View {
       // Add button
       Button(action: onAdd) {
         Image(systemName: "plus.circle.fill")
-          .font(.system(size: 24))
+          .font(.system(size: LayoutTokens.IconSize.xl))
           .foregroundStyle(.blue)
       }
       .buttonStyle(.plain)
     }
-    .padding(.horizontal, 16)
-    .padding(.vertical, 12)
+    .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
+    .padding(.vertical, LayoutTokens.Spacing.md)
     .background(Color.clear)
     .glassEffect(.clear)
   }

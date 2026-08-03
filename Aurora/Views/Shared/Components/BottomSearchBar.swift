@@ -5,21 +5,22 @@ struct BottomSearchBar: View {
   @Binding var isSearching: Bool
   var placeholder: String = "Search"
   @FocusState private var isFocused: Bool
+  @Environment(\.horizontalSizeClass) private var sizeClass
 
   // Aurora purple accent color
   private let purpleAccent = Color(red: 0.6, green: 0.4, blue: 0.9)
 
   var body: some View {
     GlassEffectContainer {
-      HStack(spacing: 12) {
+      HStack(spacing: LayoutTokens.Spacing.md) {
         // Search field in glass capsule
-        HStack(spacing: 10) {
+        HStack(spacing: LayoutTokens.Spacing.sm) {
           Image(systemName: "magnifyingglass")
-            .font(.system(size: 18, weight: .medium))
+            .font(.system(size: LayoutTokens.IconSize.md, weight: .medium))
             .foregroundStyle(Theme.primary)
 
           TextField(placeholder, text: $text)
-            .font(.system(size: 17))
+            .font(.system(size: LayoutTokens.Typography.body + 1))
             .textFieldStyle(.plain)
             .focused($isFocused)
             .submitLabel(.search)
@@ -29,28 +30,28 @@ struct BottomSearchBar: View {
 
           // Mic icon on the right side of the field
           Image(systemName: "mic.fill")
-            .font(.system(size: 16))
+            .font(.system(size: LayoutTokens.Typography.body))
             .foregroundStyle(.secondary)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.horizontal, LayoutTokens.Spacing.md)
+        .padding(.vertical, LayoutTokens.Spacing.sm + 4)
         .glassEffect(.clear.interactive())
         .clipShape(Capsule())
 
         // Circular X dismiss button (separate from search field)
         Button(action: dismissSearch) {
           Image(systemName: "xmark")
-            .font(.system(size: 18))
+            .font(.system(size: LayoutTokens.IconSize.md))
             .foregroundStyle(Theme.primary)
         }
         .buttonStyle(.plain)
-        .frame(width: 44, height: 44)
+        .frame(width: LayoutTokens.IconSize.rowFrame, height: LayoutTokens.IconSize.rowFrame)
         .contentShape(Circle())
         .glassEffect(.clear.interactive())
         .clipShape(Circle())
       }
-      .padding(.horizontal, 16)
-      .padding(.vertical, 12)
+      .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
+      .padding(.vertical, LayoutTokens.Spacing.sm + 4)
       .onAppear {
         if isSearching { isFocused = true }
       }

@@ -19,6 +19,7 @@ struct CalendarView: View {
   @State private var dayDetailExpanded = true
   @State private var navigationPath = NavigationPath()
   @Namespace private var namespace
+  @Environment(\.horizontalSizeClass) private var sizeClass
 
   private let calendar = Calendar.current
 
@@ -116,7 +117,7 @@ struct CalendarView: View {
   var body: some View {
     NavigationStack(path: $navigationPath) {
       ScrollView(showsIndicators: false) {
-        VStack(spacing: 20) {
+        VStack(spacing: LayoutTokens.Spacing.xl) {
           if !searchText.isEmpty {
             searchResultsView
           } else {
@@ -125,13 +126,13 @@ struct CalendarView: View {
             dayDetailSection
           }
         }
-        .padding(.horizontal, 16)
-        .padding(.bottom, 100)
+        .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
+        .padding(.bottom, LayoutTokens.Padding.scrollBottom)
       }
       .background(Color.clear.auroraBackground())
       .navigationTitle("Calendar")
       .toolbarTitleDisplayMode(.inlineLarge)
-      .safeAreaPadding(.top, 8)
+      .safeAreaPadding(.top, LayoutTokens.Spacing.sm)
       .safeAreaInset(edge: .bottom) {
         if isSearching {
           BottomSearchBar(text: $searchText, isSearching: $isSearching)
@@ -179,7 +180,7 @@ struct CalendarView: View {
   // MARK: - Month Calendar Card
 
   private var monthCalendarCard: some View {
-    VStack(spacing: 16) {
+    VStack(spacing: LayoutTokens.Spacing.lg) {
       // Month header with navigation (glass effect)
       HStack {
         Button {
@@ -189,18 +190,18 @@ struct CalendarView: View {
           }
         } label: {
           Image(systemName: "chevron.left")
-            .font(.system(size: 16, weight: .semibold))
+            .font(.system(size: LayoutTokens.Typography.body, weight: .semibold))
             .foregroundStyle(Theme.primary)
-            .frame(width: 36, height: 36)
+            .frame(width: LayoutTokens.CardHeight.calendarNavButton, height: LayoutTokens.CardHeight.calendarNavButton)
             .glassEffect(.regular)
         }
 
         Spacer()
 
         Text(monthYearString)
-          .font(.system(size: 18, weight: .bold))
+          .font(.system(size: LayoutTokens.Typography.title3, weight: .bold))
           .foregroundStyle(.primary)
-          .padding(.horizontal, 20)
+          .padding(.horizontal, LayoutTokens.Spacing.xl)
           .padding(.vertical, 10)
           .glassEffect(.regular)
 
@@ -213,37 +214,37 @@ struct CalendarView: View {
           }
         } label: {
           Image(systemName: "chevron.right")
-            .font(.system(size: 16, weight: .semibold))
+            .font(.system(size: LayoutTokens.Typography.body, weight: .semibold))
             .foregroundStyle(Theme.primary)
-            .frame(width: 36, height: 36)
+            .frame(width: LayoutTokens.CardHeight.calendarNavButton, height: LayoutTokens.CardHeight.calendarNavButton)
             .glassEffect(.regular)
         }
       }
-      .padding(.horizontal, 8)
+      .padding(.horizontal, LayoutTokens.Spacing.sm)
 
       // Weekday headers
-      LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
+      LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: LayoutTokens.Spacing.sm) {
         ForEach(weekdays, id: \.self) { day in
           Text(day)
-            .font(.system(size: 12, weight: .semibold))
+            .font(.system(size: LayoutTokens.Typography.caption, weight: .semibold))
             .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity)
         }
       }
 
       // Calendar grid
-      LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
+      LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: LayoutTokens.Spacing.sm) {
         ForEach(Array(currentMonthDates.enumerated()), id: \.offset) { _, date in
           if let date = date {
             dayCell(for: date)
           } else {
             Color.clear
-              .frame(height: 44)
+              .frame(height: LayoutTokens.CardHeight.calendarDay)
           }
         }
       }
     }
-    .padding(.horizontal, 16)
+    .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
   }
 
   private func dayCell(for date: Date) -> some View {
@@ -257,9 +258,9 @@ struct CalendarView: View {
         selectedDate = date
       }
     } label: {
-      VStack(spacing: 2) {
+      VStack(spacing: LayoutTokens.Spacing.xs / 2) {
         Text("\(dayNumber)")
-          .font(.system(size: 15, weight: isToday ? .bold : .medium))
+          .font(.system(size: LayoutTokens.Typography.callout, weight: isToday ? .bold : .medium))
           .foregroundStyle(isSelected ? .white : (isToday ? Theme.primary : .primary))
 
         // Task indicator dots
@@ -272,7 +273,7 @@ struct CalendarView: View {
             .frame(width: 5, height: 5)
         }
       }
-      .frame(width: 44, height: 44)
+      .frame(width: LayoutTokens.CardHeight.calendarDay, height: LayoutTokens.CardHeight.calendarDay)
       .background {
         if isSelected {
           Circle()
@@ -290,31 +291,31 @@ struct CalendarView: View {
   // MARK: - Upcoming Tasks Card
 
   private var upcomingTasksCard: some View {
-    HStack(spacing: 16) {
+    HStack(spacing: LayoutTokens.Spacing.lg) {
       // Icon
       ZStack {
         Circle()
           .fill(Theme.primary.opacity(0.2))
-          .frame(width: 48, height: 48)
+          .frame(width: LayoutTokens.IconSize.circleBackground, height: LayoutTokens.IconSize.circleBackground)
 
         Image(systemName: "calendar.badge.clock")
-          .font(.system(size: 22, weight: .medium))
+          .font(.system(size: LayoutTokens.IconSize.lg, weight: .medium))
           .foregroundStyle(Theme.primary)
       }
 
       // Text content
-      VStack(alignment: .leading, spacing: 4) {
+      VStack(alignment: .leading, spacing: LayoutTokens.Spacing.xs) {
         Text("Upcoming Tasks")
-          .font(.system(size: 14, weight: .medium))
+          .font(.system(size: LayoutTokens.Typography.subheadline, weight: .medium))
           .foregroundStyle(.secondary)
 
-        HStack(alignment: .firstTextBaseline, spacing: 4) {
+        HStack(alignment: .firstTextBaseline, spacing: LayoutTokens.Spacing.xs) {
           Text("\(upcomingTasksCount)")
-            .font(.system(size: 28, weight: .bold))
+            .font(.system(size: LayoutTokens.Typography.largeNumber, weight: .bold))
             .foregroundStyle(Theme.primary)
 
           Text(upcomingTasksCount == 1 ? "task" : "tasks")
-            .font(.system(size: 16, weight: .medium))
+            .font(.system(size: LayoutTokens.Typography.body, weight: .medium))
             .foregroundStyle(.secondary)
         }
       }
@@ -322,10 +323,10 @@ struct CalendarView: View {
       Spacer()
 
       Text("Next 7 days")
-        .font(.system(size: 12, weight: .medium))
+        .font(.system(size: LayoutTokens.Typography.caption, weight: .medium))
         .foregroundStyle(.tertiary)
     }
-    .padding(16)
+    .padding(LayoutTokens.Padding.cardInner(for: sizeClass))
     .frame(maxWidth: .infinity)
     .glassEffect(.clear.tint(Theme.primary.opacity(0.15)))
   }
@@ -333,7 +334,7 @@ struct CalendarView: View {
   // MARK: - Day Detail Section
 
   private var dayDetailSection: some View {
-    VStack(alignment: .leading, spacing: 12) {
+    VStack(alignment: .leading, spacing: LayoutTokens.Spacing.md) {
       Button {
         withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
           dayDetailExpanded.toggle()
@@ -341,17 +342,17 @@ struct CalendarView: View {
       } label: {
         HStack {
           Text(selectedDayFormatted)
-            .font(.system(size: 22, weight: .bold))
+            .font(.system(size: LayoutTokens.Typography.title2, weight: .bold))
             .foregroundStyle(.primary)
 
           Image(systemName: dayDetailExpanded ? "chevron.down" : "chevron.right")
-            .font(.system(size: 14, weight: .semibold))
+            .font(.system(size: LayoutTokens.Typography.subheadline, weight: .semibold))
             .foregroundStyle(.secondary)
             .contentTransition(.symbolEffect(.replace))
 
           Spacer()
         }
-        .padding(.horizontal, 4)
+        .padding(.horizontal, LayoutTokens.Padding.sectionTitleInset)
       }
       .buttonStyle(.plain)
 
@@ -359,7 +360,7 @@ struct CalendarView: View {
         if tasksForSelectedDay.isEmpty {
           emptyDayState
         } else {
-          VStack(spacing: 8) {
+          VStack(spacing: LayoutTokens.Spacing.sm) {
             ForEach(tasksForSelectedDay) { task in
               EditableTaskRow(
                 task: task,
@@ -378,41 +379,41 @@ struct CalendarView: View {
   }
 
   private var emptyDayState: some View {
-    VStack(spacing: 12) {
+    VStack(spacing: LayoutTokens.Spacing.md) {
       Image(systemName: "calendar.badge.checkmark")
-        .font(.system(size: 36))
+        .font(.system(size: LayoutTokens.Typography.emptyStateIcon))
         .foregroundStyle(.secondary.opacity(0.5))
 
       Text("No tasks scheduled")
-        .font(.system(size: 15))
+        .font(.system(size: LayoutTokens.Typography.callout))
         .foregroundStyle(.secondary)
 
       Text("Enjoy your free time!")
-        .font(.system(size: 13))
+        .font(.system(size: LayoutTokens.Typography.footnote))
         .foregroundStyle(.tertiary)
     }
     .frame(maxWidth: .infinity)
-    .padding(.vertical, 32)
+    .padding(.vertical, LayoutTokens.Spacing.xxl * 2)
   }
 
   // MARK: - Search Results
 
   private var searchResultsView: some View {
-    VStack(spacing: 8) {
+    VStack(spacing: LayoutTokens.Spacing.sm) {
       if searchResults.isEmpty {
-        VStack(spacing: 12) {
+        VStack(spacing: LayoutTokens.Spacing.md) {
           Image(systemName: "magnifyingglass")
-            .font(.system(size: 36))
+            .font(.system(size: LayoutTokens.Typography.emptyStateIcon))
             .foregroundStyle(.secondary)
           Text("No results found")
-            .font(.system(size: 15))
+            .font(.system(size: LayoutTokens.Typography.callout))
             .foregroundStyle(.secondary)
           Text("Try a different search term")
-            .font(.system(size: 13))
+            .font(.system(size: LayoutTokens.Typography.footnote))
             .foregroundStyle(.tertiary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 60)
+        .padding(.vertical, LayoutTokens.Spacing.xxl * 3)
       } else {
         ForEach(searchResults) { task in
           EditableTaskRow(

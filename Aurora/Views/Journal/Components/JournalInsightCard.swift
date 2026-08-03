@@ -12,30 +12,31 @@ struct JournalInsightCard: View {
   let entriesThisMonth: Int
 
   @State private var animateStars = false
+  @Environment(\.horizontalSizeClass) private var sizeClass
 
   private let accentGold = Color(red: 0.95, green: 0.82, blue: 0.55)
 
   var body: some View {
     HStack(spacing: 0) {
       // Left side - Stats
-      VStack(alignment: .leading, spacing: 12) {
+      VStack(alignment: .leading, spacing: LayoutTokens.Spacing.md) {
         // Title with subtle icon
-        HStack(spacing: 8) {
+        HStack(spacing: LayoutTokens.Spacing.sm) {
           Text("Your Journey")
-            .font(.system(size: 13, weight: .semibold))
+            .font(.system(size: LayoutTokens.Typography.footnote, weight: .semibold))
             .foregroundStyle(accentGold.opacity(0.6))
             .textCase(.uppercase)
             .tracking(0.5)
         }
 
         // Main stat
-        HStack(alignment: .firstTextBaseline, spacing: 6) {
+        HStack(alignment: .firstTextBaseline, spacing: LayoutTokens.Spacing.xs) {
           Text("\(totalEntries)")
-            .font(.system(size: 48, weight: .bold, design: .rounded))
+            .font(.system(size: LayoutTokens.Typography.heroStat, weight: .bold, design: .rounded))
             .foregroundStyle(accentGold)
 
           Text(totalEntries == 1 ? "entry" : "entries")
-            .font(.system(size: 18, weight: .medium))
+            .font(.system(size: LayoutTokens.Typography.title3, weight: .medium))
             .foregroundStyle(accentGold.opacity(0.5))
         }
       }
@@ -74,7 +75,7 @@ struct JournalInsightCard: View {
       }
       .frame(width: 100, height: 100)
     }
-    .padding(20)
+    .padding(LayoutTokens.Padding.cardInner(for: sizeClass))
     .frame(maxWidth: .infinity, alignment: .leading)
     .glassEffect(.clear.tint(Theme.secondary))
     .onAppear {

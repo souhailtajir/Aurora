@@ -19,24 +19,25 @@ struct TasksView: View {
   @State private var isSearching = false
   @State private var navigationPath = NavigationPath()
   @Namespace private var namespace
+  @Environment(\.horizontalSizeClass) private var sizeClass
 
   var body: some View {
     NavigationStack(path: $navigationPath) {
       ScrollView {
-        VStack(spacing: 16) {
+        VStack(spacing: LayoutTokens.Spacing.lg) {
           if !searchText.isEmpty {
             searchResultsView
           } else {
             mainContentView
           }
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
       }
       .scrollIndicators(.hidden)
       .background(Color.clear.auroraBackground())
       .navigationTitle("Tasks")
       .toolbarTitleDisplayMode(.inlineLarge)
-      .safeAreaPadding(.top, 8)
+      .safeAreaPadding(.top, LayoutTokens.Spacing.sm)
       .safeAreaInset(edge: .bottom) {
         if isSearching {
           BottomSearchBar(text: $searchText, isSearching: $isSearching)
@@ -118,7 +119,7 @@ struct TasksView: View {
   // MARK: - Main Content
 
   private var mainContentView: some View {
-    VStack(spacing: 20) {
+    VStack(spacing: LayoutTokens.Spacing.xl) {
       smartListCardsGrid
       suggestedListSection
       myListsSection
@@ -130,7 +131,7 @@ struct TasksView: View {
   private var smartListCardsGrid: some View {
     let visibleLists = orderedVisibleSmartLists
 
-    return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+    return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: LayoutTokens.Spacing.md) {
       ForEach(visibleLists, id: \.self) { listType in
         SmartListCard(
           listType: listType,
@@ -208,7 +209,7 @@ struct TasksView: View {
   private var myListsSection: some View {
     @Bindable var store = taskStore
 
-    return VStack(alignment: .leading, spacing: 12) {
+    return VStack(alignment: .leading, spacing: LayoutTokens.Spacing.md) {
       Button {
         withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
           store.myListsExpanded.toggle()
@@ -216,22 +217,22 @@ struct TasksView: View {
       } label: {
         HStack {
           Text("My Lists")
-            .font(.system(size: 22, weight: .bold))
+            .font(.system(size: LayoutTokens.Typography.title2, weight: .bold))
             .foregroundStyle(.primary)
 
           Image(systemName: store.myListsExpanded ? "chevron.down" : "chevron.right")
-            .font(.system(size: 14, weight: .semibold))
+            .font(.system(size: LayoutTokens.Typography.subheadline, weight: .semibold))
             .foregroundStyle(.secondary)
             .contentTransition(.symbolEffect(.replace))
 
           Spacer()
         }
-        .padding(.horizontal, 4)
+        .padding(.horizontal, LayoutTokens.Padding.sectionTitleInset)
       }
       .buttonStyle(.plain)
 
       if store.myListsExpanded {
-        VStack(spacing: 8) {
+        VStack(spacing: LayoutTokens.Spacing.sm) {
           ForEach(taskStore.categories) { category in
             myListRow(for: category)
           }
@@ -245,27 +246,27 @@ struct TasksView: View {
     Button {
       navigationPath.append(CategoryTasksView.CategoryFilter.category(category))
     } label: {
-      HStack(spacing: 12) {
+      HStack(spacing: LayoutTokens.Spacing.md) {
         Image(systemName: category.iconName)
-          .font(.system(size: 18, weight: .semibold))
+          .font(.system(size: LayoutTokens.IconSize.md, weight: .semibold))
           .foregroundStyle(Color(hex: category.colorHex))
 
         Text(category.name)
-          .font(.system(size: 16, weight: .medium))
+          .font(.system(size: LayoutTokens.Typography.body, weight: .medium))
           .foregroundStyle(.primary)
 
         Spacer()
 
         Text("\(getCount(for: category))")
-          .font(.system(size: 16, weight: .medium))
+          .font(.system(size: LayoutTokens.Typography.body, weight: .medium))
           .foregroundStyle(.secondary)
 
         Image(systemName: "chevron.right")
-          .font(.system(size: 12, weight: .semibold))
+          .font(.system(size: LayoutTokens.Typography.caption, weight: .semibold))
           .foregroundStyle(.tertiary)
       }
-      .padding(.horizontal, 16)
-      .padding(.vertical, 14)
+      .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
+      .padding(.vertical, LayoutTokens.Padding.rowVertical)
       .glassEffect()
     }
     .buttonStyle(.plain)
@@ -274,21 +275,21 @@ struct TasksView: View {
   // MARK: - Search Results
 
   private var searchResultsView: some View {
-    VStack(spacing: 8) {
+    VStack(spacing: LayoutTokens.Spacing.sm) {
       if searchResults.isEmpty {
-        VStack(spacing: 12) {
+        VStack(spacing: LayoutTokens.Spacing.md) {
           Image(systemName: "magnifyingglass")
-            .font(.system(size: 36))
+            .font(.system(size: LayoutTokens.Typography.emptyStateIcon))
             .foregroundStyle(.secondary)
           Text("No results found")
-            .font(.system(size: 15))
+            .font(.system(size: LayoutTokens.Typography.callout))
             .foregroundStyle(.secondary)
           Text("Try a different search term")
-            .font(.system(size: 13))
+            .font(.system(size: LayoutTokens.Typography.footnote))
             .foregroundStyle(.tertiary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 60)
+        .padding(.vertical, LayoutTokens.Spacing.xxl * 3)
       } else {
         ForEach(searchResults) { task in
           EditableTaskRow(

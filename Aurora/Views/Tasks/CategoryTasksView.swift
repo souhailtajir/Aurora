@@ -18,6 +18,7 @@ struct CategoryTasksView: View {
   @State private var searchText = ""
   @State private var isSearching = false
   @FocusState private var focusedTaskId: UUID?
+  @Environment(\.horizontalSizeClass) private var sizeClass
 
   enum CategoryFilter: Hashable {
     case smartList(SmartListType)
@@ -92,7 +93,7 @@ struct CategoryTasksView: View {
               selectedTaskForDetails = task
             }
           )
-          .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+          .listRowInsets(LayoutTokens.listRowInsets(for: sizeClass))
           .listRowBackground(Color.clear)
           .listRowSeparator(.hidden)
         }
@@ -162,30 +163,30 @@ struct CategoryTasksView: View {
       ZStack {
         Circle()
           .fill(filterType.tintColor)
-          .frame(width: 56, height: 56)
+          .frame(width: LayoutTokens.CardHeight.fab, height: LayoutTokens.CardHeight.fab)
 
         Image(systemName: "plus")
-          .font(.system(size: 24, weight: .semibold))
+          .font(.system(size: LayoutTokens.IconSize.xl, weight: .semibold))
           .foregroundStyle(.white)
       }
       .shadow(color: filterType.tintColor.opacity(0.4), radius: 8, x: 0, y: 4)
     }
     .buttonStyle(.plain)
-    .padding(.trailing, 20)
-    .padding(.bottom, 20)
+    .padding(.trailing, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
+    .padding(.bottom, LayoutTokens.Spacing.xl)
   }
 
   private var emptyStateView: some View {
-    VStack(spacing: 12) {
+    VStack(spacing: LayoutTokens.Spacing.md) {
       Image(systemName: filterType.icon)
-        .font(.system(size: 48))
+        .font(.system(size: LayoutTokens.Typography.heroStat))
         .foregroundStyle(filterType.tintColor.opacity(0.6))
       Text(searchText.isEmpty ? "No tasks" : "No matching tasks")
-        .font(.system(size: 16, weight: .medium))
+        .font(.system(size: LayoutTokens.Typography.body, weight: .medium))
         .foregroundStyle(.primary.opacity(0.6))
     }
     .frame(maxWidth: .infinity)
-    .padding(.vertical, 60)
+    .padding(.vertical, LayoutTokens.Spacing.xxl * 3)
   }
 
   private func addNewTask() {

@@ -12,6 +12,7 @@ struct EditableTaskRow: View {
   @Binding var editingTaskId: UUID?
   @FocusState.Binding var focusedTaskId: UUID?
   var onInfoTap: (() -> Void)? = nil
+  @Environment(\.horizontalSizeClass) private var sizeClass
 
   @State private var editedTitle: String = ""
 
@@ -27,7 +28,7 @@ struct EditableTaskRow: View {
   }
 
   var body: some View {
-    HStack(spacing: 14) {
+    HStack(spacing: LayoutTokens.Spacing.md + 2) {
       // Completion Toggle
       Button {
         HapticService.shared.impact(.light)
@@ -39,11 +40,11 @@ struct EditableTaskRow: View {
           Circle()
             .strokeBorder(categoryColor, lineWidth: 2)
             .background(Circle().fill(task.isCompleted ? categoryColor : .clear))
-            .frame(width: 24, height: 24)
+            .frame(width: LayoutTokens.CardHeight.taskCheckbox, height: LayoutTokens.CardHeight.taskCheckbox)
 
           if task.isCompleted {
             Image(systemName: "checkmark")
-              .font(.system(size: 11, weight: .black))
+              .font(.system(size: LayoutTokens.IconSize.xs, weight: .black))
               .foregroundStyle(.white)
               .transition(.scale.combined(with: .opacity))
           }
@@ -55,7 +56,7 @@ struct EditableTaskRow: View {
       VStack(alignment: .leading, spacing: 3) {
         if isEditing {
           TextField("Task title...", text: $editedTitle)
-            .font(.system(size: 16, weight: .medium))
+            .font(.system(size: LayoutTokens.Typography.body, weight: .medium))
             .textFieldStyle(.plain)
             .focused($focusedTaskId, equals: task.id)
             .onSubmit { saveAndDismiss() }
@@ -65,28 +66,28 @@ struct EditableTaskRow: View {
             }
         } else {
           Text(task.title.isEmpty ? "New Task" : task.title)
-            .font(.system(size: 16, weight: .medium))
+            .font(.system(size: LayoutTokens.Typography.body, weight: .medium))
             .foregroundStyle(task.isCompleted ? .secondary : .primary)
             .strikethrough(task.isCompleted, color: .secondary.opacity(0.7))
             .lineLimit(1)
         }
 
         if let date = task.date, !isEditing {
-          HStack(spacing: 8) {
-            HStack(spacing: 4) {
+          HStack(spacing: LayoutTokens.Spacing.sm) {
+            HStack(spacing: LayoutTokens.Spacing.xs) {
               Image(systemName: "calendar")
-                .font(.system(size: 10, weight: .medium))
+                .font(.system(size: LayoutTokens.Typography.micro, weight: .medium))
               Text(formatDate(date))
-                .font(.system(size: 12, weight: .medium))
+                .font(.system(size: LayoutTokens.Typography.caption, weight: .medium))
             }
             .foregroundStyle(isOverdue(date) ? .red : .secondary)
 
             if hasTimeComponent(date) {
-              HStack(spacing: 4) {
+              HStack(spacing: LayoutTokens.Spacing.xs) {
                 Image(systemName: "clock")
-                  .font(.system(size: 10, weight: .medium))
+                  .font(.system(size: LayoutTokens.Typography.micro, weight: .medium))
                 Text(formatTime(date))
-                  .font(.system(size: 12, weight: .medium))
+                  .font(.system(size: LayoutTokens.Typography.caption, weight: .medium))
               }
               .foregroundStyle(isOverdue(date) ? .red : .secondary)
             }
@@ -107,16 +108,16 @@ struct EditableTaskRow: View {
       }
 
       // Priority & Flag Indicators
-      HStack(spacing: 8) {
+      HStack(spacing: LayoutTokens.Spacing.sm) {
         if task.priority == .high {
           Image(systemName: "exclamationmark.circle.fill")
-            .font(.system(size: 14))
+            .font(.system(size: LayoutTokens.IconSize.sm))
             .foregroundStyle(.red)
         }
 
         if task.isFlagged {
           Image(systemName: "flag.fill")
-            .font(.system(size: 14))
+            .font(.system(size: LayoutTokens.IconSize.sm))
             .foregroundStyle(.orange)
         }
 
@@ -125,17 +126,17 @@ struct EditableTaskRow: View {
             onInfoTap?()
           } label: {
             Image(systemName: "info.circle.fill")
-              .font(.system(size: 18))
+              .font(.system(size: LayoutTokens.IconSize.md))
               .foregroundStyle(Theme.primary)
           }
           .buttonStyle(.plain)
         }
       }
     }
-    .padding(.horizontal, 16)
-    .padding(.vertical, 13)
+    .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
+    .padding(.vertical, LayoutTokens.Padding.rowVertical)
     .background {
-      RoundedRectangle(cornerRadius: 16, style: .continuous)
+      RoundedRectangle(cornerRadius: LayoutTokens.Radius.md, style: .continuous)
         .glassEffect(.clear)
     }
     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
@@ -149,7 +150,7 @@ struct EditableTaskRow: View {
 
       Button {
         withAnimation {
-          var updated = task
+          let updated = task
           updated.isFlagged.toggle()
           taskStore.updateTask(updated)
         }
@@ -166,7 +167,7 @@ struct EditableTaskRow: View {
   private func saveAndDismiss() {
     let trimmed = editedTitle.trimmingCharacters(in: .whitespacesAndNewlines)
     if !trimmed.isEmpty && trimmed != task.title {
-      var updated = task
+      let updated = task
       updated.title = trimmed
       taskStore.updateTask(updated)
     }

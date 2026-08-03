@@ -4,7 +4,7 @@
 //
 
 import SwiftUI
-
+@MainActor
 enum Theme {
   static let primary = Color(red: 0.48, green: 0.38, blue: 0.95)
   static let secondary = Color(red: 0.62, green: 0.48, blue: 0.98)

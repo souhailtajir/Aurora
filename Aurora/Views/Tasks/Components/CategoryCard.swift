@@ -12,35 +12,36 @@ struct CategoryCard: View {
   let title: String
   let count: Int
   let color: Color
+  @Environment(\.horizontalSizeClass) private var sizeClass
 
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
       HStack(alignment: .top) {
         // Icon with subtle background
         Image(systemName: icon)
-          .font(.system(size: 20, weight: .bold))
+          .font(.system(size: LayoutTokens.IconSize.lg, weight: .bold))
           .foregroundStyle(color)
 
         Spacer()
 
         Text("\(count)")
-          .font(.system(size: 24, weight: .bold))
+          .font(.system(size: LayoutTokens.Typography.title1, weight: .bold))
           .foregroundStyle(color)
       }
 
       Spacer()
 
       Text(title)
-        .font(.system(size: 16, weight: .semibold))
+        .font(.system(size: LayoutTokens.Typography.body, weight: .semibold))
         .foregroundStyle(color)
         .lineLimit(1)
         .minimumScaleFactor(0.8)
     }
-    .padding(20)
-    .frame(height: 110)  // Slightly taller for better proportions
+    .padding(LayoutTokens.Padding.cardInner(for: sizeClass))
+    .frame(height: LayoutTokens.CardHeight.category)  // Slightly taller for better proportions
     .frame(maxWidth: .infinity, alignment: .leading)
     .background(Color.clear)
     .glassEffect(.clear)  // User requested clear glass
-    .clipShape(RoundedRectangle(cornerRadius: 24))
+    .clipShape(RoundedRectangle(cornerRadius: LayoutTokens.Radius.xl))
   }
 }

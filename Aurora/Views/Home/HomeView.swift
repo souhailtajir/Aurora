@@ -18,6 +18,7 @@ struct HomeView: View {
   @State private var showingNewTask = false
   @State private var showingPinnedCards = false
   @State private var navigationPath = NavigationPath()
+  @Environment(\.horizontalSizeClass) private var sizeClass
 
   private var todaysTasks: [Task] {
     let tasks = taskStore.tasks.filter { task in
@@ -71,7 +72,7 @@ struct HomeView: View {
   var body: some View {
     NavigationStack(path: $navigationPath) {
       ScrollView(showsIndicators: false) {
-        VStack(spacing: 20) {
+        VStack(spacing: LayoutTokens.Spacing.xl) {
           if !searchText.isEmpty {
             searchResultsView
           } else {
@@ -81,12 +82,12 @@ struct HomeView: View {
             todaysAgendaSection
           }
         }
-        .padding(.bottom, 100)
+        .padding(.bottom, LayoutTokens.Padding.scrollBottom)
       }
       .background(Color.clear.auroraBackground())
       .navigationTitle("Home")
       .toolbarTitleDisplayMode(.inlineLarge)
-      .safeAreaPadding(.top, 8)
+      .safeAreaPadding(.top, LayoutTokens.Spacing.sm)
       .safeAreaInset(edge: .bottom) {
         if isSearching {
           BottomSearchBar(text: $searchText, isSearching: $isSearching)
@@ -153,19 +154,19 @@ struct HomeView: View {
   // MARK: - Celestial Section
 
   private var celestialSection: some View {
-    VStack(spacing: 16) {
+    VStack(spacing: LayoutTokens.Spacing.lg) {
       switch userProfileStore.profile.celestialDisplayMode {
       case .zodiacPlanet:
         PlanetSceneView(planet: userProfileStore.profile.rulingPlanet)
-          .frame(height: 190)
+          .frame(height: LayoutTokens.CardHeight.celestial)
       case .moonPhase:
         MoonPhaseVisualizationView(moonInfo: MoonPhase.getInfo())
-          .frame(height: 190)
+          .frame(height: LayoutTokens.CardHeight.celestial)
       }
 
-      VStack(spacing: 4) {
+      VStack(spacing: LayoutTokens.Spacing.xs) {
         Text(currentGreeting)
-          .font(.system(size: 28, weight: .bold, design: .rounded))
+          .font(.system(size: LayoutTokens.Typography.largeTitle, weight: .bold, design: .rounded))
           .foregroundStyle(
             LinearGradient(
               colors: [Theme.primary, Theme.secondary],
@@ -175,11 +176,11 @@ struct HomeView: View {
           )
 
         Text(formattedDate)
-          .font(.system(size: 15, weight: .medium))
+          .font(.system(size: LayoutTokens.Typography.callout, weight: .medium))
           .foregroundStyle(.secondary)
       }
     }
-    .padding(.vertical, 8)
+    .padding(.vertical, LayoutTokens.Spacing.sm)
   }
 
   // MARK: - Daily Progress Card
@@ -187,16 +188,16 @@ struct HomeView: View {
   private var dailyProgressCard: some View {
     let percentage = totalTodayTasks > 0 ? (completedTasksCount * 100) / totalTodayTasks : 0
 
-    return VStack(alignment: .leading, spacing: 12) {
+    return VStack(alignment: .leading, spacing: LayoutTokens.Spacing.md) {
       HStack {
         Text("Daily Progress")
-          .font(.system(size: 15, weight: .semibold))
+          .font(.system(size: LayoutTokens.Typography.callout, weight: .semibold))
           .foregroundStyle(.secondary)
 
         Spacer()
 
         Text("\(completedTasksCount)/\(max(totalTodayTasks, 1))")
-          .font(.system(size: 15, weight: .bold, design: .rounded))
+          .font(.system(size: LayoutTokens.Typography.callout, weight: .bold, design: .rounded))
           .foregroundStyle(Theme.primary)
       }
 
@@ -221,18 +222,18 @@ struct HomeView: View {
             .animation(.spring(response: 0.5, dampingFraction: 0.75), value: completedTasksCount)
         }
       }
-      .frame(height: 8)
+      .frame(height: LayoutTokens.CardHeight.progressBar)
 
       Text("\(percentage)% of today's tasks completed")
-        .font(.system(size: 13, weight: .medium))
+        .font(.system(size: LayoutTokens.Typography.footnote, weight: .medium))
         .foregroundStyle(.secondary)
     }
-    .padding(16)
+    .padding(LayoutTokens.Padding.cardInner(for: sizeClass))
     .background {
-      RoundedRectangle(cornerRadius: 20, style: .continuous)
+      RoundedRectangle(cornerRadius: LayoutTokens.Radius.lg, style: .continuous)
             .glassEffect(.clear)
     }
-    .padding(.horizontal, 16)
+    .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
   }
 
   // MARK: - Pinned Cards Section
@@ -254,7 +255,7 @@ struct HomeView: View {
 
     return Group {
       if !cardsToShow.isEmpty {
-        HStack(spacing: 12) {
+        HStack(spacing: LayoutTokens.Spacing.md) {
           ForEach(cardsToShow) { item in
             switch item {
             case .smartList(let listType):
@@ -268,7 +269,7 @@ struct HomeView: View {
             }
           }
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
       }
     }
   }
@@ -276,7 +277,7 @@ struct HomeView: View {
   // MARK: - Today's Agenda Section
 
   private var todaysAgendaSection: some View {
-    VStack(alignment: .leading, spacing: 12) {
+    VStack(alignment: .leading, spacing: LayoutTokens.Spacing.md) {
       Button {
         withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
           agendaExpanded.toggle()
@@ -284,35 +285,35 @@ struct HomeView: View {
       } label: {
         HStack {
           Text("Today's Agenda")
-            .font(.system(size: 22, weight: .bold))
+            .font(.system(size: LayoutTokens.Typography.title2, weight: .bold))
             .foregroundStyle(.primary)
 
           Image(systemName: agendaExpanded ? "chevron.down" : "chevron.right")
-            .font(.system(size: 14, weight: .semibold))
+            .font(.system(size: LayoutTokens.Typography.subheadline, weight: .semibold))
             .foregroundStyle(.secondary)
 
           Spacer()
         }
-        .padding(.horizontal, 4)
+        .padding(.horizontal, LayoutTokens.Padding.sectionTitleInset)
       }
       .buttonStyle(.plain)
-      .padding(.horizontal, 16)
+      .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
 
       if agendaExpanded {
         if todaysTasks.isEmpty {
-          VStack(spacing: 10) {
+          VStack(spacing: LayoutTokens.Spacing.sm) {
             Image(systemName: "checkmark.circle.fill")
-              .font(.system(size: 38))
+              .font(.system(size: LayoutTokens.Typography.emptyStateIcon))
               .foregroundStyle(Theme.primary.opacity(0.7))
 
             Text("All clear for today!")
-              .font(.system(size: 15, weight: .medium))
+              .font(.system(size: LayoutTokens.Typography.callout, weight: .medium))
               .foregroundStyle(.secondary)
           }
           .frame(maxWidth: .infinity)
-          .padding(.vertical, 32)
+          .padding(.vertical, LayoutTokens.Spacing.xxl * 2)
         } else {
-          VStack(spacing: 8) {
+          VStack(spacing: LayoutTokens.Spacing.sm) {
             ForEach(todaysTasks) { task in
               EditableTaskRow(
                 task: task,
@@ -324,7 +325,7 @@ struct HomeView: View {
               )
             }
           }
-          .padding(.horizontal, 16)
+          .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
           .transition(.opacity.combined(with: .move(edge: .top)))
         }
       }
@@ -334,18 +335,18 @@ struct HomeView: View {
   // MARK: - Search Results
 
   private var searchResultsView: some View {
-    VStack(spacing: 8) {
+    VStack(spacing: LayoutTokens.Spacing.sm) {
       if searchResults.isEmpty {
-        VStack(spacing: 12) {
+        VStack(spacing: LayoutTokens.Spacing.md) {
           Image(systemName: "magnifyingglass")
-            .font(.system(size: 36))
+            .font(.system(size: LayoutTokens.Typography.emptyStateIcon))
             .foregroundStyle(.secondary)
           Text("No matching tasks found")
-            .font(.system(size: 15, weight: .medium))
+            .font(.system(size: LayoutTokens.Typography.callout, weight: .medium))
             .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 60)
+        .padding(.vertical, LayoutTokens.Spacing.xxl * 3)
       } else {
         ForEach(searchResults) { task in
           EditableTaskRow(
@@ -359,7 +360,7 @@ struct HomeView: View {
         }
       }
     }
-    .padding(.horizontal, 16)
+    .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
   }
 
   private var searchResults: [Task] {
