@@ -2,10 +2,12 @@
 //  Aurora
 //
 
+#if os(iOS)
 import AVFoundation
 import CoreLocation
-import PhotosUI
 import Speech
+#endif
+import PhotosUI
 import SwiftUI
 
 struct EntryEditorView: View {
@@ -24,15 +26,19 @@ struct EntryEditorView: View {
   // Toolbar state
   @State private var showCamera = false
   @State private var showMagicAlert = false
+  #if os(iOS)
   @State private var locationService = LocationService()
+  #endif
   @State private var isLoadingLocation = false
 
+  #if os(iOS)
   // Dictation state
   @State private var isDictating = false
   @State private var speechRecognizer = SFSpeechRecognizer(locale: Locale.current)
   @State private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
   @State private var recognitionTask: SFSpeechRecognitionTask?
   @State private var audioEngine = AVAudioEngine()
+  #endif
 
   private var entry: JournalEntry? {
     taskStore.journalEntries.first { $0.id == entryId }
@@ -51,9 +57,11 @@ struct EntryEditorView: View {
     .navigationTitle(title.isEmpty ? "New Entry" : title)
     .toolbarTitleDisplayMode(.inline)
     .navigationBarBackButtonHidden(true)
+    #if os(iOS)
     .toolbar(.hidden, for: .tabBar)
+    #endif
     .toolbar {
-      ToolbarItem(placement: .topBarLeading) {
+      ToolbarItem(placement: .platformTopBarLeading) {
         Button {
           dismiss()
         } label: {
@@ -62,7 +70,7 @@ struct EntryEditorView: View {
         }
       }
 
-      ToolbarItem(placement: .topBarTrailing) {
+      ToolbarItem(placement: .platformTopBarTrailing) {
         Button {
           dismiss()
         } label: {
@@ -79,12 +87,14 @@ struct EntryEditorView: View {
     .onAppear {
       loadEntry()
     }
+    #if os(iOS)
     .fullScreenCover(isPresented: $showCamera) {
       CameraPicker { imageData in
         addImageToEntry(imageData)
       }
       .ignoresSafeArea()
     }
+    #endif
     .alert("Writing Tools", isPresented: $showMagicAlert) {
       Button("OK", role: .cancel) {}
     } message: {
@@ -110,6 +120,7 @@ struct EntryEditorView: View {
         }
       }
 
+      #if os(iOS)
       // Camera
       Button {
         requestCameraAccess()
@@ -142,6 +153,7 @@ struct EntryEditorView: View {
             .foregroundStyle(entry?.locationName != nil ? Theme.primary : Theme.tint)
         }
       }
+      #endif
 
       // Magic wand / writing tools
       Button {
@@ -244,9 +256,9 @@ struct EntryEditorView: View {
   private func imagesGrid(_ images: [Data]) -> some View {
     LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], spacing: 8) {
       ForEach(Array(images.enumerated()), id: \.offset) { index, data in
-        if let uiImage = UIImage(data: data) {
+        if let image = Image(data: data) {
           ZStack(alignment: .topTrailing) {
-            Image(uiImage: uiImage)
+            image
               .resizable()
               .scaledToFill()
               .frame(width: 80, height: 80)
@@ -310,6 +322,7 @@ struct EntryEditorView: View {
     taskStore.updateJournalEntry(entry)
   }
 
+  #if os(iOS)
   private func requestCameraAccess() {
     switch AVCaptureDevice.authorizationStatus(for: .video) {
     case .authorized:
@@ -445,4 +458,5 @@ struct EntryEditorView: View {
 
     try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
   }
+  #endif
 }

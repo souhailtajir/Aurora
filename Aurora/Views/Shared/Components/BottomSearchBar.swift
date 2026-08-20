@@ -67,8 +67,7 @@ struct BottomSearchBar: View {
   }
 
   private func dismissSearch() {
-    UIApplication.shared.sendAction(
-      #selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    dismissKeyboard()
 
     withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
       text = ""

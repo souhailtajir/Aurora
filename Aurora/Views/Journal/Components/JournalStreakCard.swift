@@ -53,8 +53,9 @@ struct JournalStreakCard: View {
       }
     }
     .padding(LayoutTokens.Padding.cardInner(for: sizeClass))
+    .padding(.horizontal, LayoutTokens.Spacing.lg)
     .frame(maxWidth: .infinity)
-    .glassEffect(.regular.tint(.orange.opacity(0.15)))
+    .glassEffect(.regular.tint(.orange.opacity(0.15)), in: .capsule)
   }
 }
 

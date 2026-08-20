@@ -50,6 +50,9 @@ struct PlanetSceneView: View {
   }
 }
 
+// MARK: - Cross-Platform SceneKit View
+
+#if os(iOS)
 private struct SceneKitView: UIViewRepresentable {
   let planet: Planet
   @Binding var rotationX: Float
@@ -62,36 +65,13 @@ private struct SceneKitView: UIViewRepresentable {
 
   func makeUIView(context: Context) -> SCNView {
     let scnView = SCNView()
-
-    // Configure view settings - optimized for performance
-    scnView.autoenablesDefaultLighting = false
-    scnView.allowsCameraControl = false
-    scnView.backgroundColor = .clear
-
-    // Performance optimizations
-    scnView.antialiasingMode = .multisampling2X  // Reduced from 4X
-    scnView.rendersContinuously = false  // Only render when needed
-    scnView.preferredFramesPerSecond = 30  // Cap at 30fps for battery
-
-    // Get or create cached scene
+    configureView(scnView)
     scnView.scene = getOrCreateScene()
-
     return scnView
   }
 
   func updateUIView(_ scnView: SCNView, context: Context) {
-    // Update planet rotation based on gesture
-    if let planetNode = scnView.scene?.rootNode.childNode(withName: "planet", recursively: false) {
-      planetNode.eulerAngles = SCNVector3(rotationX, rotationY, 0)
-    }
-
-    // Pause/resume rendering based on visibility
-    scnView.scene?.isPaused = !isVisible
-
-    // Request a render update when rotation changes
-    if isVisible {
-      scnView.setNeedsDisplay()
-    }
+    updateView(scnView)
   }
 
   private func getOrCreateScene() -> SCNScene {
@@ -106,8 +86,85 @@ private struct SceneKitView: UIViewRepresentable {
     Self.sceneCache[planet] = scene
     return scene
   }
+}
 
-  private func createScene() -> SCNScene {
+#elseif os(macOS)
+private struct SceneKitView: NSViewRepresentable {
+  let planet: Planet
+  @Binding var rotationX: Float
+  @Binding var rotationY: Float
+  let isVisible: Bool
+
+  // Static scene cache to avoid recreating scenes
+  private static var sceneCache: [Planet: SCNScene] = [:]
+  private static let cacheLock = NSLock()
+
+  func makeNSView(context: Context) -> SCNView {
+    let scnView = SCNView()
+    configureView(scnView)
+    scnView.scene = getOrCreateScene()
+    return scnView
+  }
+
+  func updateNSView(_ scnView: SCNView, context: Context) {
+    updateView(scnView)
+  }
+
+  private func getOrCreateScene() -> SCNScene {
+    Self.cacheLock.lock()
+    defer { Self.cacheLock.unlock() }
+
+    if let cached = Self.sceneCache[planet] {
+      return cached
+    }
+
+    let scene = createScene()
+    Self.sceneCache[planet] = scene
+    return scene
+  }
+}
+#endif
+
+// MARK: - Shared Configuration
+
+extension SceneKitView {
+  fileprivate func configureView(_ scnView: SCNView) {
+    scnView.autoenablesDefaultLighting = false
+    scnView.allowsCameraControl = false
+
+    #if os(iOS)
+    scnView.backgroundColor = .clear
+    #elseif os(macOS)
+    scnView.backgroundColor = .clear
+    scnView.layer?.backgroundColor = .clear
+    #endif
+
+    // Performance optimizations
+    scnView.antialiasingMode = .multisampling2X
+    scnView.rendersContinuously = false
+    scnView.preferredFramesPerSecond = 30
+  }
+
+  fileprivate func updateView(_ scnView: SCNView) {
+    // Update planet rotation based on gesture
+    if let planetNode = scnView.scene?.rootNode.childNode(withName: "planet", recursively: false) {
+      planetNode.eulerAngles = SCNVector3(x: SCNFloat(rotationX), y: SCNFloat(rotationY), z: 0)
+    }
+
+    // Pause/resume rendering based on visibility
+    scnView.scene?.isPaused = !isVisible
+
+    // Request a render update when rotation changes
+    if isVisible {
+      #if os(iOS)
+      scnView.setNeedsDisplay()
+      #elseif os(macOS)
+      scnView.needsDisplay = true
+      #endif
+    }
+  }
+
+  fileprivate func createScene() -> SCNScene {
     let scene = SCNScene()
 
     // Create planet node with name for gesture control
@@ -130,7 +187,7 @@ private struct SceneKitView: UIViewRepresentable {
     ambientLight.light = SCNLight()
     ambientLight.light?.type = .ambient
     ambientLight.light?.intensity = 400
-    ambientLight.light?.color = UIColor(white: 0.6, alpha: 1.0)
+    ambientLight.light?.color = PlatformColor(white: 0.6, alpha: 1.0)
     scene.rootNode.addChildNode(ambientLight)
 
     // Main directional light - simulates sun
@@ -138,10 +195,10 @@ private struct SceneKitView: UIViewRepresentable {
     sunLight.light = SCNLight()
     sunLight.light?.type = .directional
     sunLight.light?.intensity = 800
-    sunLight.light?.color = UIColor(white: 1.0, alpha: 1.0)
+    sunLight.light?.color = PlatformColor(white: 1.0, alpha: 1.0)
     sunLight.light?.castsShadow = false
     // Position light at 45 degrees from upper right
-    sunLight.eulerAngles = SCNVector3(x: -Float.pi / 4, y: Float.pi / 4, z: 0)
+    sunLight.eulerAngles = SCNVector3(x: SCNFloat(-Float.pi / 4), y: SCNFloat(Float.pi / 4), z: 0)
     scene.rootNode.addChildNode(sunLight)
 
     return scene

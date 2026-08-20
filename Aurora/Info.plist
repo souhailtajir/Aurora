@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSAlarmKitUsageDescription</key>
+	<string>We need alarm access to remind you about your tasks at the scheduled time</string>
+	<key>NSJournalingSuggestionsUsageDescription</key>
+	<string>Aurora uses journaling suggestions to help inspire your journal entries</string>
 	<key>UIApplicationShortcutItems</key>
 	<array>
 		<dict>
@@ -33,21 +37,5 @@
 	<array>
 		<dict/>
 	</array>
-	<key>NSAlarmKitUsageDescription</key>
-	<string>We need alarm access to remind you about your tasks at the scheduled time</string>
-	<key>NSFaceIDUsageDescription</key>
-	<string>Unlock your journal with Face ID</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Aurora uses your camera to add photos to journal entries</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Aurora uses your photo library to add images to journal entries</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Aurora uses your location to tag journal entries with where they were written</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Aurora uses your microphone to add voice recordings to journal entries</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Aurora uses speech recognition to transcribe your voice into journal entries</string>
-	<key>NSJournalingSuggestionsUsageDescription</key>
-	<string>Aurora uses journaling suggestions to help inspire your journal entries</string>
 </dict>
 </plist>

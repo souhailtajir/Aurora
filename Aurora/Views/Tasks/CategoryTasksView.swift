@@ -16,7 +16,6 @@ struct CategoryTasksView: View {
   @State private var editingTaskId: UUID? = nil
   @State private var selectedTaskForDetails: Task? = nil
   @State private var searchText = ""
-  @State private var isSearching = false
   @FocusState private var focusedTaskId: UUID?
   @Environment(\.horizontalSizeClass) private var sizeClass
 
@@ -111,35 +110,19 @@ struct CategoryTasksView: View {
           .listRowSeparator(.hidden)
       }
       .listStyle(.plain)
+      .platformListRowSpacing(0)
       .scrollContentBackground(.hidden)
       .scrollIndicators(.hidden)
+      .navigationTitle(Text(filterType.title).foregroundColor(filterType.tintColor))
+      .toolbarTitleDisplayMode(.inlineLarge)
+      #if os(iOS)
+      .toolbarColorScheme(.dark, for: .navigationBar)
+      .toolbar(.hidden, for: .tabBar)
+      #endif
+      .searchable(text: $searchText, prompt: "Search tasks...")
 
       // Color-coordinated floating add button
       addTaskButton
-    }
-    .safeAreaInset(edge: .bottom) {
-      if isSearching {
-        BottomSearchBar(
-          text: $searchText,
-          isSearching: $isSearching,
-          placeholder: "Search tasks..."
-        )
-        .transition(.move(edge: .bottom).combined(with: .opacity))
-      }
-    }
-    .animation(.spring(response: 0.35, dampingFraction: 0.8), value: isSearching)
-    .navigationTitle(Text(filterType.title).foregroundColor(filterType.tintColor))
-    .navigationBarTitleDisplayMode(.automatic)
-    .toolbarColorScheme(.dark, for: .navigationBar)
-    .toolbar(.hidden, for: .tabBar)
-    .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
-        Button("Search", systemImage: "magnifyingglass") {
-          withAnimation {
-            isSearching = true
-          }
-        }
-      }
     }
     .tint(filterType.tintColor)
     .onTapGesture {
@@ -151,6 +134,9 @@ struct CategoryTasksView: View {
       TaskSheet(task: task)
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
+        #if os(macOS)
+        .frame(minWidth: 480, idealWidth: 520, minHeight: 600)
+        #endif
     }
   }
 

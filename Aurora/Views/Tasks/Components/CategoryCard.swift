@@ -38,10 +38,10 @@ struct CategoryCard: View {
         .minimumScaleFactor(0.8)
     }
     .padding(LayoutTokens.Padding.cardInner(for: sizeClass))
+    .padding(.horizontal, LayoutTokens.Spacing.md)
     .frame(height: LayoutTokens.CardHeight.category)  // Slightly taller for better proportions
     .frame(maxWidth: .infinity, alignment: .leading)
-    .background(Color.clear)
-    .glassEffect(.clear)  // User requested clear glass
-    .clipShape(RoundedRectangle(cornerRadius: LayoutTokens.Radius.xl))
+    .buttonStyle(.plain)
+    .glassEffect(.clear, in: .capsule)
   }
 }

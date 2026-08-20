@@ -3,6 +3,7 @@
 //  Aurora
 //
 
+#if os(iOS)
 import SwiftUI
 import UIKit
 
@@ -48,3 +49,4 @@ struct CameraPicker: UIViewControllerRepresentable {
     }
   }
 }
+#endif

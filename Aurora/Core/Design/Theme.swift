@@ -64,35 +64,55 @@ struct AuroraBackgroundView: View {
   @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
-    ZStack {
-      if colorScheme == .dark {
-        Color(hex: "0B0A12")
+    GeometryReader { geo in
+      let size = geo.size
+      // Scale factor: circles grow proportionally to container on macOS
+      let scaleFactor = max(size.width, size.height) / 800
 
-        Circle()
-          .fill(Theme.primary.opacity(0.18))
-          .frame(width: 320, height: 320)
-          .blur(radius: 90)
-          .offset(x: -120, y: -200)
+      ZStack {
+        if colorScheme == .dark {
+          Color(hex: "0B0A12")
 
-        Circle()
-          .fill(Theme.secondary.opacity(0.15))
-          .frame(width: 280, height: 280)
-          .blur(radius: 80)
-          .offset(x: 140, y: 180)
-      } else {
-        Color(hex: "F7F6FA")
+          Circle()
+            .fill(Theme.primary.opacity(0.18))
+            .frame(width: 320 * scaleFactor, height: 320 * scaleFactor)
+            .blur(radius: 90 * scaleFactor)
+            .offset(x: -size.width * 0.15, y: -size.height * 0.3)
 
-        Circle()
-          .fill(Color(hex: "E3D7FF").opacity(0.5))
-          .frame(width: 340, height: 340)
-          .blur(radius: 90)
-          .offset(x: -100, y: -180)
+          Circle()
+            .fill(Theme.secondary.opacity(0.15))
+            .frame(width: 280 * scaleFactor, height: 280 * scaleFactor)
+            .blur(radius: 80 * scaleFactor)
+            .offset(x: size.width * 0.18, y: size.height * 0.25)
 
-        Circle()
-          .fill(Color(hex: "D3C2FF").opacity(0.35))
-          .frame(width: 300, height: 300)
-          .blur(radius: 80)
-          .offset(x: 120, y: 160)
+          // Third accent circle for depth on larger screens
+          Circle()
+            .fill(Color(hex: "2A1F5E").opacity(0.12))
+            .frame(width: 200 * scaleFactor, height: 200 * scaleFactor)
+            .blur(radius: 70 * scaleFactor)
+            .offset(x: size.width * 0.25, y: -size.height * 0.15)
+        } else {
+          Color(hex: "F7F6FA")
+
+          Circle()
+            .fill(Color(hex: "E3D7FF").opacity(0.5))
+            .frame(width: 340 * scaleFactor, height: 340 * scaleFactor)
+            .blur(radius: 90 * scaleFactor)
+            .offset(x: -size.width * 0.12, y: -size.height * 0.25)
+
+          Circle()
+            .fill(Color(hex: "D3C2FF").opacity(0.35))
+            .frame(width: 300 * scaleFactor, height: 300 * scaleFactor)
+            .blur(radius: 80 * scaleFactor)
+            .offset(x: size.width * 0.15, y: size.height * 0.22)
+
+          // Third accent circle for depth on larger screens
+          Circle()
+            .fill(Color(hex: "C4B5F0").opacity(0.2))
+            .frame(width: 220 * scaleFactor, height: 220 * scaleFactor)
+            .blur(radius: 70 * scaleFactor)
+            .offset(x: size.width * 0.2, y: -size.height * 0.1)
+        }
       }
     }
     .ignoresSafeArea()

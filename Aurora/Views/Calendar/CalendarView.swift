@@ -14,7 +14,7 @@ struct CalendarView: View {
   @State private var selectedTaskForDetails: Task? = nil
   @FocusState private var focusedTaskId: UUID?
   @State private var searchText = ""
-  @State private var isSearching = false
+  @State private var showingNewTask = false
   @State private var selectedDate = Date()
   @State private var dayDetailExpanded = true
   @State private var navigationPath = NavigationPath()
@@ -121,9 +121,23 @@ struct CalendarView: View {
           if !searchText.isEmpty {
             searchResultsView
           } else {
+            #if os(macOS)
+            // Side-by-side layout on macOS
+            HStack(alignment: .top, spacing: LayoutTokens.Spacing.xl) {
+              VStack(spacing: LayoutTokens.Spacing.xl) {
+                monthCalendarCard
+                upcomingTasksCard
+              }
+              .frame(minWidth: 320, maxWidth: 420)
+
+              dayDetailSection
+                .frame(maxWidth: .infinity)
+            }
+            #else
             monthCalendarCard
             upcomingTasksCard
             dayDetailSection
+            #endif
           }
         }
         .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
@@ -133,46 +147,53 @@ struct CalendarView: View {
       .navigationTitle("Calendar")
       .toolbarTitleDisplayMode(.inlineLarge)
       .safeAreaPadding(.top, LayoutTokens.Spacing.sm)
-      .safeAreaInset(edge: .bottom) {
-        if isSearching {
-          BottomSearchBar(text: $searchText, isSearching: $isSearching)
-            .transition(.move(edge: .bottom).combined(with: .opacity))
-        }
-      }
-      .animation(.spring(response: 0.35, dampingFraction: 0.8), value: isSearching)
+      .searchable(text: $searchText, prompt: "Search calendar...")
       .toolbar {
-        ToolbarItemGroup(placement: .topBarTrailing) {
-          Button("Search", systemImage: "magnifyingglass") {
-            withAnimation {
-              isSearching = true
-            }
+        ToolbarItem(placement: .platformTopBarTrailing) {
+          Button("Add Task", systemImage: "plus") {
+            showingNewTask = true
           }
         }
 
-        ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItem(placement: .platformTopBarTrailing) {
           Button("Today", systemImage: "calendar.badge.clock") {
             withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
               selectedDate = Date()
             }
           }
         }
+        #if os(iOS)
         ToolbarSpacer(.fixed, placement: .topBarTrailing)
 
-        ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItem(placement: .platformTopBarTrailing) {
           NavigationLink(value: "settings") {
             Image(systemName: "gearshape")
           }
         }
+        #endif
       }
+      #if os(iOS)
       .navigationDestination(for: String.self) { destination in
         if destination == "settings" {
           SettingsView()
         }
       }
+      #endif
+      .sheet(isPresented: $showingNewTask) {
+        TaskSheet(initialDate: selectedDate)
+          .presentationDetents([.large])
+          .presentationDragIndicator(.visible)
+          #if os(macOS)
+          .frame(minWidth: 480, idealWidth: 520, minHeight: 600)
+          #endif
+      }
       .sheet(item: $selectedTaskForDetails) { task in
         TaskSheet(task: task)
           .presentationDetents([.large])
           .presentationDragIndicator(.visible)
+          #if os(macOS)
+          .frame(minWidth: 480, idealWidth: 520, minHeight: 600)
+          #endif
       }
     }
   }
@@ -193,8 +214,9 @@ struct CalendarView: View {
             .font(.system(size: LayoutTokens.Typography.body, weight: .semibold))
             .foregroundStyle(Theme.primary)
             .frame(width: LayoutTokens.CardHeight.calendarNavButton, height: LayoutTokens.CardHeight.calendarNavButton)
-            .glassEffect(.regular)
+            .glassEffect(.regular, in: .circle)
         }
+        .buttonStyle(.plain)
 
         Spacer()
 
@@ -203,7 +225,7 @@ struct CalendarView: View {
           .foregroundStyle(.primary)
           .padding(.horizontal, LayoutTokens.Spacing.xl)
           .padding(.vertical, 10)
-          .glassEffect(.regular)
+          .glassEffect(.regular, in: .capsule)
 
         Spacer()
 
@@ -217,8 +239,9 @@ struct CalendarView: View {
             .font(.system(size: LayoutTokens.Typography.body, weight: .semibold))
             .foregroundStyle(Theme.primary)
             .frame(width: LayoutTokens.CardHeight.calendarNavButton, height: LayoutTokens.CardHeight.calendarNavButton)
-            .glassEffect(.regular)
+            .glassEffect(.regular, in: .circle)
         }
+        .buttonStyle(.plain)
       }
       .padding(.horizontal, LayoutTokens.Spacing.sm)
 

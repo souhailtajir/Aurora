@@ -52,7 +52,7 @@ struct SuggestedListRow: View {
     .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
     .padding(.vertical, LayoutTokens.Spacing.md)
     .background(Color.clear)
-    .glassEffect(.clear)
+    .glassEffect(.clear, in: .capsule)
   }
 }
 

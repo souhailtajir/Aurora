@@ -6,7 +6,12 @@
 //
 
 import SceneKit
+
+#if canImport(UIKit)
 import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 nonisolated final class PlanetNode: SCNNode {
     private let planet: Planet
@@ -41,12 +46,12 @@ nonisolated final class PlanetNode: SCNNode {
         
         // Load texture image from Assets
         let textureName = getTextureName(for: planet)
-        if let textureImage = UIImage(named: textureName) {
+        if let textureImage = PlatformImage(named: textureName) {
             material.diffuse.contents = textureImage
         } else {
             // Fallback to solid color if texture not found
             let color = planet.baseColor
-            material.diffuse.contents = UIColor(
+            material.diffuse.contents = PlatformColor(
                 red: color.red,
                 green: color.green,
                 blue: color.blue,
@@ -67,44 +72,44 @@ nonisolated final class PlanetNode: SCNNode {
             // Sun: warm glow, more subtle emission for realism
             material.metalness.contents = 0.0
             material.roughness.contents = 0.4
-            material.emission.contents = UIColor(red: 1.0, green: 0.9, blue: 0.7, alpha: 1.0)
+            material.emission.contents = PlatformColor(red: 1.0, green: 0.9, blue: 0.7, alpha: 1.0)
             material.emission.intensity = 0.15
             
         case .mars:
             // Mars: rocky, moderate roughness for texture visibility
             material.metalness.contents = 0.0
             material.roughness.contents = 0.7
-            material.specular.contents = UIColor(white: 0.2, alpha: 1.0)
+            material.specular.contents = PlatformColor(white: 0.2, alpha: 1.0)
             
         case .venus:
             // Venus: smooth atmosphere
             material.metalness.contents = 0.0
             material.roughness.contents = 0.3
-            material.specular.contents = UIColor(white: 0.4, alpha: 1.0)
+            material.specular.contents = PlatformColor(white: 0.4, alpha: 1.0)
             
         case .jupiter, .saturn:
             // Gas giants: banded, moderate roughness
             material.metalness.contents = 0.0
             material.roughness.contents = 0.5
-            material.specular.contents = UIColor(white: 0.3, alpha: 1.0)
+            material.specular.contents = PlatformColor(white: 0.3, alpha: 1.0)
             
         case .neptune, .uranus:
             // Ice giants: smooth, slightly glossy
             material.metalness.contents = 0.0
             material.roughness.contents = 0.4
-            material.specular.contents = UIColor(white: 0.45, alpha: 1.0)
+            material.specular.contents = PlatformColor(white: 0.45, alpha: 1.0)
             
         case .moon:
             // Moon: moderate roughness to show craters
             material.metalness.contents = 0.0
             material.roughness.contents = 0.75
-            material.specular.contents = UIColor(white: 0.15, alpha: 1.0)
+            material.specular.contents = PlatformColor(white: 0.15, alpha: 1.0)
             
         case .mercury:
             // Mercury: rocky but smoother than moon
             material.metalness.contents = 0.0
             material.roughness.contents = 0.65
-            material.specular.contents = UIColor(white: 0.2, alpha: 1.0)
+            material.specular.contents = PlatformColor(white: 0.2, alpha: 1.0)
         }
         
         sphere.materials = [material]
@@ -155,12 +160,12 @@ nonisolated final class PlanetNode: SCNNode {
         let ringMaterial = SCNMaterial()
         
         // Load ring texture
-        if let ringTexture = UIImage(named: "8k_saturn_ring") {
+        if let ringTexture = PlatformImage(named: "8k_saturn_ring") {
             ringMaterial.diffuse.contents = ringTexture
             ringMaterial.diffuse.wrapS = .clamp
             ringMaterial.diffuse.wrapT = .clamp
         } else {
-            ringMaterial.diffuse.contents = UIColor(red: 0.9, green: 0.8, blue: 0.6, alpha: 0.7)
+            ringMaterial.diffuse.contents = PlatformColor(red: 0.9, green: 0.8, blue: 0.6, alpha: 0.7)
         }
         
         // Configure material
@@ -175,7 +180,7 @@ nonisolated final class PlanetNode: SCNNode {
         let ringNode = SCNNode(geometry: ringGeometry)
         
         // Rotate and tilt the ring
-        ringNode.eulerAngles = SCNVector3(x: Float.pi / 2 + 0.47, y: 0, z: 0)
+        ringNode.eulerAngles = SCNVector3(x: SCNFloat(Float.pi / 2 + 0.47), y: 0, z: 0)
         
         self.addChildNode(ringNode)
     }

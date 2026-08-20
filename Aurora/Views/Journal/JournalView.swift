@@ -11,7 +11,6 @@ import SwiftUI
 struct JournalView: View {
   @Environment(TaskStore.self) var taskStore
   @State private var searchText = ""
-  @State private var isSearching = false
   @State private var navigationPath = NavigationPath()
   @State private var isLocked = false
   @State private var showNewEntryFullScreen = false
@@ -32,24 +31,15 @@ struct JournalView: View {
       .navigationTitle("Journal")
       .toolbarTitleDisplayMode(.inlineLarge)
       .safeAreaPadding(.top, LayoutTokens.Spacing.sm)
-      .safeAreaInset(edge: .bottom) {
-        if isSearching {
-          BottomSearchBar(
-            text: $searchText, isSearching: $isSearching, placeholder: "Search journals..."
-          )
-          .transition(.move(edge: .bottom).combined(with: .opacity))
-        }
-      }
-      .animation(.spring(response: 0.35, dampingFraction: 0.8), value: isSearching)
+      .searchable(text: $searchText, prompt: "Search journal...")
       .toolbar {
-        ToolbarItemGroup(placement: .topBarTrailing) {
-          Button("Search", systemImage: "magnifyingglass") {
-            withAnimation {
-              isSearching = true
-            }
+        ToolbarItem(placement: .platformTopBarTrailing) {
+          Button("New Entry", systemImage: "square.and.pencil") {
+            createNewEntryFullScreen()
           }
         }
-        ToolbarItem(placement: .topBarTrailing) {
+
+        ToolbarItem(placement: .platformTopBarTrailing) {
           Button {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
               isLocked.toggle()
@@ -60,13 +50,15 @@ struct JournalView: View {
               systemImage: isLocked ? "lock.open" : "lock.fill")
           }
         }
+        #if os(iOS)
         ToolbarSpacer(.fixed, placement: .topBarTrailing)
 
-        ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItem(placement: .platformTopBarTrailing) {
           NavigationLink(value: "settings") {
             Image(systemName: "gearshape")
           }
         }
+        #endif
       }
 
       .onChange(of: taskStore.addJournalTrigger) { _, newValue in
@@ -75,6 +67,7 @@ struct JournalView: View {
           taskStore.addJournalTrigger = false
         }
       }
+      #if os(iOS)
       .fullScreenCover(isPresented: $showNewEntryFullScreen) {
         if let entryId = newEntryId {
           NavigationStack {
@@ -82,6 +75,16 @@ struct JournalView: View {
           }
         }
       }
+      #else
+      .sheet(isPresented: $showNewEntryFullScreen) {
+        if let entryId = newEntryId {
+          NavigationStack {
+            EntryEditorView(entryId: entryId)
+          }
+          .frame(minWidth: 500, minHeight: 600)
+        }
+      }
+      #endif
       .navigationDestination(for: JournalNav.self) { nav in
         switch nav {
         case .allEntries:
@@ -93,11 +96,13 @@ struct JournalView: View {
       .navigationDestination(for: JournalEntry.self) { entry in
         EntryEditorView(entryId: entry.id)
       }
+      #if os(iOS)
       .navigationDestination(for: String.self) { destination in
         if destination == "settings" {
           SettingsView()
         }
       }
+      #endif
     }
   }
 
@@ -151,6 +156,7 @@ struct JournalView: View {
       }
     }
     .listStyle(.plain)
+    .platformListRowSpacing(0)
     .scrollContentBackground(.hidden)
     .scrollIndicators(.hidden)
   }
@@ -159,6 +165,21 @@ struct JournalView: View {
 
   @ViewBuilder
   private var mainContentRows: some View {
+    // Insight + Streak cards (side-by-side on macOS)
+    #if os(macOS)
+    HStack(spacing: LayoutTokens.Spacing.md) {
+      JournalInsightCard(
+        totalEntries: taskStore.journalEntries.count,
+        entriesThisMonth: entriesThisMonth
+      )
+      .frame(maxWidth: .infinity)
+      JournalStreakCard(streak: streak)
+        .frame(maxWidth: .infinity)
+    }
+    .listRowInsets(LayoutTokens.listRowInsets(vertical: LayoutTokens.Spacing.sm, for: sizeClass))
+    .listRowBackground(Color.clear)
+    .listRowSeparator(.hidden)
+    #else
     // Insight card
     JournalInsightCard(
       totalEntries: taskStore.journalEntries.count,
@@ -173,6 +194,7 @@ struct JournalView: View {
       .listRowInsets(LayoutTokens.listRowInsets(vertical: LayoutTokens.Spacing.sm, for: sizeClass))
       .listRowBackground(Color.clear)
       .listRowSeparator(.hidden)
+    #endif
 
     // Navigation rows
     NavigationRow(
@@ -223,6 +245,12 @@ struct JournalView: View {
         }
       }
     }
+
+    Color.clear
+      .frame(height: LayoutTokens.Padding.scrollBottom)
+      .listRowInsets(EdgeInsets())
+      .listRowBackground(Color.clear)
+      .listRowSeparator(.hidden)
   }
 
   // MARK: - Search Results Content (for List)

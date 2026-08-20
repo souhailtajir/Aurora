@@ -19,6 +19,82 @@ struct SettingsView: View {
   }
 
   var body: some View {
+    #if os(macOS)
+    macOSSettingsBody
+    #else
+    iOSSettingsBody
+    #endif
+  }
+
+  // MARK: - macOS Settings (TabView)
+
+  #if os(macOS)
+  private var macOSSettingsBody: some View {
+    TabView {
+      // General Tab
+      ScrollView(showsIndicators: false) {
+        VStack(spacing: LayoutTokens.Spacing.xl) {
+          heroSection
+          generalSection
+          soundsAndHapticsSection
+          journalSection
+          privacySection
+          dataAndStorageSection
+          dangerZoneSection
+        }
+        .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
+        .padding(.vertical, LayoutTokens.Padding.sectionTop)
+      }
+      .background(Color.clear.auroraBackground())
+      .tabItem {
+        Label("General", systemImage: "gearshape")
+      }
+
+      // Notifications Tab
+      NotificationSettingsView()
+        .tabItem {
+          Label("Notifications", systemImage: "bell.badge.fill")
+        }
+
+      // Appearance Tab
+      AppearanceSettingsView()
+        .tabItem {
+          Label("Appearance", systemImage: "paintbrush.fill")
+        }
+
+      // About Tab
+      ScrollView(showsIndicators: false) {
+        VStack(spacing: LayoutTokens.Spacing.xl) {
+          aboutSection
+        }
+        .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
+        .padding(.vertical, LayoutTokens.Padding.sectionTop)
+      }
+      .background(Color.clear.auroraBackground())
+      .tabItem {
+        Label("About", systemImage: "info.circle")
+      }
+    }
+    .sheet(isPresented: $showingBirthDatePicker) {
+      BirthDatePickerView(
+        userProfileStore: userProfileStore, isPresented: $showingBirthDatePicker)
+    }
+    .alert("Reset All Settings?", isPresented: $showingResetAlert) {
+      Button("Cancel", role: .cancel) {}
+      Button("Reset", role: .destructive) {
+        taskStore.hapticFeedbackEnabled = true
+        taskStore.completionSoundsEnabled = true
+        HapticService.shared.notification(.success)
+      }
+    } message: {
+      Text("This will reset all settings to their default values. Your tasks will not be affected.")
+    }
+  }
+  #endif
+
+  // MARK: - iOS Settings (ScrollView)
+
+  private var iOSSettingsBody: some View {
     ScrollView(showsIndicators: false) {
       VStack(spacing: LayoutTokens.Spacing.xl) {
         heroSection
@@ -39,7 +115,9 @@ struct SettingsView: View {
     .navigationTitle("Settings")
     .toolbarTitleDisplayMode(.inlineLarge)
     .safeAreaPadding(.top, 8)
+    #if os(iOS)
     .toolbar(.hidden, for: .tabBar)
+    #endif
     .sheet(isPresented: $showingBirthDatePicker) {
       BirthDatePickerView(
         userProfileStore: userProfileStore, isPresented: $showingBirthDatePicker)
@@ -214,7 +292,7 @@ extension SettingsView {
 
         Button {
           if let url = URL(string: "https://example.com/privacy") {
-            UIApplication.shared.open(url)
+            openURL(url)
           }
         } label: {
           SettingsRow(
@@ -270,7 +348,7 @@ extension SettingsView {
 
         Button {
           if let url = URL(string: "https://example.com/terms") {
-            UIApplication.shared.open(url)
+            openURL(url)
           }
         } label: {
           SettingsRow(

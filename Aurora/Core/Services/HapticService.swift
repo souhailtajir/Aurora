@@ -3,6 +3,7 @@
 //  Aurora
 //
 
+#if os(iOS)
 import UIKit
 
 @MainActor
@@ -72,3 +73,26 @@ final class HapticService {
     selectionGenerator.selectionChanged()
   }
 }
+
+#elseif os(macOS)
+
+import Foundation
+
+/// macOS stub — haptic feedback is not available on Mac.
+/// All methods are no-ops, keeping the call-site API identical.
+@MainActor
+@Observable
+final class HapticService {
+  static let shared = HapticService()
+  private init() {}
+
+  enum FeedbackStyle { case light, medium, heavy, soft, rigid }
+  enum NotificationType { case success, warning, error }
+
+  func prepare() {}
+  func impact(_ style: FeedbackStyle = .medium) {}
+  func notification(_ type: NotificationType) {}
+  func selection() {}
+}
+
+#endif

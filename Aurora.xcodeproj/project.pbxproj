@@ -44,16 +44,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		D21E8EE130191E790041C2BD /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			dstPath = "";
-			dstSubfolder = Frameworks;
-			files = (
-				D21E8EE030191E790041C2BD /* SwiftUI.framework in Embed Frameworks */,
-				D21E8EE330191E7B0041C2BD /* WidgetKit.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-		};
 		D2C9DB052F61A8BF00867A47 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			dstPath = "";
@@ -85,9 +75,6 @@
 			membershipExceptions = (
 				Info.plist,
 			);
-			platformFiltersByRelativePath = {
-				Views/Journal/Components/JournalStreakCard.swift = (ios, );
-			};
 			target = D26D7C262EDE4C1D00B0101A /* Aurora */;
 		};
 		D2C9DB092F61A8BF00867A47 /* Exceptions for "AuroraWidget" folder in "AuroraWidgetExtension" target */ = {
@@ -266,7 +253,6 @@
 				D2C9DAEA2F61A8BD00867A47 /* Sources */,
 				D2C9DAEB2F61A8BD00867A47 /* Frameworks */,
 				D2C9DAEC2F61A8BD00867A47 /* Resources */,
-				D21E8EE130191E790041C2BD /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -529,29 +515,42 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = RP6JRXYV7V;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = YES;
+				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
+				ENABLE_RESOURCE_ACCESS_LOCATION = YES;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Aurora/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Aurora;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Aurora needs camera access to capture moments for your journal entries";
-				INFOPLIST_KEY_NSFaceIDUsageDescription = "Authenticate to access Recently Deleted entries\nAuthenticate to access Recently Deleted entries\nAuthenticate to access Recently Deleted entries";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Aurora needs photo library access to add images to your journal entries";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Aurora uses your camera to add photos to journal entries";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Unlock your journal with Face ID";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Aurora uses your location to tag journal entries with where they were written";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Aurora uses your microphone to add voice recordings to journal entries";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Aurora uses your photo library to add images to journal entries";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Aurora uses speech recognition to transcribe your voice into journal entries";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = souhailtajir.Aurora;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -574,29 +573,42 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = RP6JRXYV7V;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = YES;
+				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
+				ENABLE_RESOURCE_ACCESS_LOCATION = YES;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Aurora/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Aurora;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Aurora needs camera access to capture moments for your journal entries";
-				INFOPLIST_KEY_NSFaceIDUsageDescription = "Authenticate to access Recently Deleted entries\nAuthenticate to access Recently Deleted entries\nAuthenticate to access Recently Deleted entries";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Aurora needs photo library access to add images to your journal entries";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Aurora uses your camera to add photos to journal entries";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Unlock your journal with Face ID";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Aurora uses your location to tag journal entries with where they were written";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Aurora uses your microphone to add voice recordings to journal entries";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Aurora uses your photo library to add images to journal entries";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Aurora uses speech recognition to transcribe your voice into journal entries";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = souhailtajir.Aurora;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -729,12 +741,13 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = souhailtajir.Aurora.AuroraWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -764,12 +777,13 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = souhailtajir.Aurora.AuroraWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;

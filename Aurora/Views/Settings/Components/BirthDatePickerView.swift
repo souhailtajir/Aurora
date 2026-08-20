@@ -56,6 +56,7 @@ struct BirthDatePickerView: View {
               .foregroundStyle(.primary)
               .frame(maxWidth: .infinity, alignment: .leading)
 
+            #if os(iOS)
             DatePicker(
               "Birth Date",
               selection: $selectedDate,
@@ -64,6 +65,15 @@ struct BirthDatePickerView: View {
             .datePickerStyle(.wheel)
             .labelsHidden()
             .frame(height: 140)
+            #else
+            DatePicker(
+              "Birth Date",
+              selection: $selectedDate,
+              displayedComponents: [.date]
+            )
+            .datePickerStyle(.graphical)
+            .labelsHidden()
+            #endif
           }
           .padding(LayoutTokens.Padding.cardHero(for: sizeClass))
           .glassEffect(.regular)
@@ -74,7 +84,7 @@ struct BirthDatePickerView: View {
         .padding(.top, LayoutTokens.Padding.sectionTop)
       }
       .navigationTitle("Birth Date")
-      .navigationBarTitleDisplayMode(.inline)
+      .toolbarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
           Button("Cancel") {

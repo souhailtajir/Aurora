@@ -9,7 +9,6 @@ struct DeletedEntriesView: View {
   @Environment(TaskStore.self) var taskStore
   @Environment(\.dismiss) var dismiss
   @State private var searchText = ""
-  @State private var isSearching = false
   @State private var isSelecting = false
   @State private var selectedEntries: Set<UUID> = []
   @Environment(\.horizontalSizeClass) private var sizeClass
@@ -64,9 +63,14 @@ struct DeletedEntriesView: View {
     }
     .scrollIndicators(.hidden)
     .background(Color.clear.auroraBackground())
+    #if os(iOS)
     .toolbar(.hidden, for: .tabBar)
+    #elseif os(macOS)
+    .toolbarBackground(.hidden, for: .windowToolbar)
+    #endif
+    .searchable(text: $searchText, prompt: "Search deleted entries...")
     .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
+      ToolbarItem(placement: .platformTopBarTrailing) {
         if !taskStore.deletedJournalEntries.isEmpty {
           Button {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
@@ -88,30 +92,13 @@ struct DeletedEntriesView: View {
           }
         }
       }
-      ToolbarSpacer(placement: .topBarTrailing)
-
-      ToolbarItem(placement: .topBarTrailing) {
-        Button("Search", systemImage: "magnifyingglass") {
-          withAnimation {
-            isSearching = true
-          }
-        }
-      }
     }
     .safeAreaInset(edge: .bottom) {
-      if isSearching {
-        BottomSearchBar(
-          text: $searchText,
-          isSearching: $isSearching,
-          placeholder: "Search deleted entries..."
-        )
-        .transition(.move(edge: .bottom).combined(with: .opacity))
-      } else if !taskStore.deletedJournalEntries.isEmpty {
+      if !taskStore.deletedJournalEntries.isEmpty {
         bottomActionBar
           .transition(.move(edge: .bottom).combined(with: .opacity))
       }
     }
-    .animation(.spring(response: 0.35, dampingFraction: 0.8), value: isSearching)
     .animation(.spring(response: 0.35, dampingFraction: 0.8), value: isSelecting)
     .animation(.spring(response: 0.35, dampingFraction: 0.8), value: selectedEntries.count)
   }

@@ -48,14 +48,14 @@ struct CategoriesView: View {
                 }
             }
             .navigationTitle("Categories")
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .platformTopBarLeading) {
                     Button("Done") {
                         dismiss()
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .platformTopBarTrailing) {
                     Button(action: {
                         showingAddCategory = true
                     }) {
@@ -115,7 +115,7 @@ struct CategoryEditView: View {
                 }
             }
             .navigationTitle(category == nil ? "New Category" : "Edit Category")
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
@@ -143,11 +143,10 @@ struct CategoryEditView: View {
         let hex = color.toHex() ?? "#000000"
         
         if let category = category {
-            var updated = category
-            updated.name = name
-            updated.colorHex = hex
-            updated.iconName = icon
-            taskStore.updateCategory(updated)
+            category.name = name
+            category.colorHex = hex
+            category.iconName = icon
+            taskStore.updateCategory(category)
         } else {
             let newCategory = TaskCategory(name: name, colorHex: hex, iconName: icon)
             taskStore.addCategory(newCategory)
@@ -158,24 +157,7 @@ struct CategoryEditView: View {
 
 extension Color {
     func toHex() -> String? {
-        let uic = UIColor(self)
-        guard let components = uic.cgColor.components, components.count >= 3 else {
-            return nil
-        }
-        let r = Float(components[0])
-        let g = Float(components[1])
-        let b = Float(components[2])
-        var a = Float(1.0)
-        
-        if components.count >= 4 {
-            a = Float(components[3])
-        }
-        
-        if a != Float(1.0) {
-            return String(format: "#%02lX%02lX%02lX%02lX", lroundf(r * 255), lroundf(g * 255), lroundf(b * 255), lroundf(a * 255))
-        } else {
-            return String(format: "#%02lX%02lX%02lX", lroundf(r * 255), lroundf(g * 255), lroundf(b * 255))
-        }
+        platformHex()
     }
 }
 

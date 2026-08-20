@@ -133,10 +133,10 @@ struct EditableTaskRow: View {
         }
       }
     }
-    .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
+    .padding(.horizontal, LayoutTokens.Padding.cardInner(for: sizeClass))
     .padding(.vertical, LayoutTokens.Padding.rowVertical)
     .background {
-      RoundedRectangle(cornerRadius: LayoutTokens.Radius.md, style: .continuous)
+      Capsule(style: .continuous)
         .glassEffect(.clear)
     }
     .swipeActions(edge: .trailing, allowsFullSwipe: true) {

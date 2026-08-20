@@ -14,6 +14,17 @@ import SwiftUI
 @MainActor
 enum LayoutTokens {
 
+  // MARK: - Platform Detection
+
+  /// Whether we are running on macOS.
+  static var isMacOS: Bool {
+    #if os(macOS)
+    return true
+    #else
+    return false
+    #endif
+  }
+
   // MARK: - Size Class Multiplier
 
   /// Returns a scaling multiplier for the current horizontal size class.
@@ -45,26 +56,53 @@ enum LayoutTokens {
 
   /// Screen-level and container-level padding tokens.
   enum Padding {
-    /// Horizontal inset for full-width scroll content (16pt compact, 24pt regular).
+    /// Horizontal inset for full-width scroll content.
+    /// macOS gets extra breathing room (32pt) vs iPad (24pt) vs iPhone (16pt).
     static func screenHorizontal(for sizeClass: UserInterfaceSizeClass?) -> CGFloat {
-      sizeClass == .regular ? 24 : 16
+      #if os(macOS)
+      return 32
+      #else
+      return sizeClass == .regular ? 24 : 16
+      #endif
     }
 
-    /// Inner padding for cards and glass containers (16pt compact, 20pt regular).
+    /// Inner padding for cards and glass containers.
+    /// macOS: 24pt, iPad: 20pt, iPhone: 16pt.
     static func cardInner(for sizeClass: UserInterfaceSizeClass?) -> CGFloat {
-      sizeClass == .regular ? 20 : 16
+      #if os(macOS)
+      return 24
+      #else
+      return sizeClass == .regular ? 20 : 16
+      #endif
     }
 
-    /// Inner padding for hero / featured cards (24pt compact, 28pt regular).
+    /// Inner padding for hero / featured cards.
+    /// macOS: 32pt, iPad: 28pt, iPhone: 24pt.
     static func cardHero(for sizeClass: UserInterfaceSizeClass?) -> CGFloat {
-      sizeClass == .regular ? 28 : 24
+      #if os(macOS)
+      return 32
+      #else
+      return sizeClass == .regular ? 28 : 24
+      #endif
     }
 
     /// Vertical padding for individual row items.
-    static let rowVertical: CGFloat = 14
+    static var rowVertical: CGFloat {
+      #if os(macOS)
+      return 10
+      #else
+      return 14
+      #endif
+    }
 
-    /// Bottom padding for scroll views to clear tab bar.
-    static let scrollBottom: CGFloat = 100
+    /// Bottom padding for scroll views to clear tab bar (iOS) or add breathing room (macOS).
+    static var scrollBottom: CGFloat {
+      #if os(macOS)
+      return 24
+      #else
+      return 100
+      #endif
+    }
 
     /// Vertical padding for section headers.
     static let sectionTop: CGFloat = 20
@@ -113,7 +151,13 @@ enum LayoutTokens {
     static let category: CGFloat = 110
 
     /// Celestial visualization (planet / moon).
-    static let celestial: CGFloat = 190
+    static var celestial: CGFloat {
+      #if os(macOS)
+      return 300
+      #else
+      return 190
+      #endif
+    }
 
     /// Calendar day cell.
     static let calendarDay: CGFloat = 44

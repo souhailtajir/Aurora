@@ -76,8 +76,9 @@ struct JournalInsightCard: View {
       .frame(width: 100, height: 100)
     }
     .padding(LayoutTokens.Padding.cardInner(for: sizeClass))
+    .padding(.horizontal, LayoutTokens.Spacing.lg)
     .frame(maxWidth: .infinity, alignment: .leading)
-    .glassEffect(.clear.tint(Theme.secondary))
+    .glassEffect(.clear.tint(Theme.secondary), in: .capsule)
     .onAppear {
       withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
         animateStars = true

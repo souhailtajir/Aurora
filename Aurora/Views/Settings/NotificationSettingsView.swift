@@ -66,6 +66,8 @@ struct NotificationSettingsView: View {
     .navigationTitle("Notifications")
     .toolbarTitleDisplayMode(.inlineLarge)
     .safeAreaPadding(.top, 8)
+    #if os(iOS)
     .toolbar(.hidden, for: .tabBar)
+    #endif
   }
 }

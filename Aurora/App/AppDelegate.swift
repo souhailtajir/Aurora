@@ -5,7 +5,6 @@
 //  Created by souhail on 3/19/26.
 //
 
-import UIKit
 import SwiftUI
 
 @Observable
@@ -13,6 +12,9 @@ final class QuickActionManager {
   static let shared = QuickActionManager()
   var action: TaskStore.QuickAction = .none
 }
+
+#if os(iOS)
+import UIKit
 
 final class AppDelegate: NSObject, UIApplicationDelegate {
   func application(
@@ -64,3 +66,4 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     } 
   }
 }
+#endif

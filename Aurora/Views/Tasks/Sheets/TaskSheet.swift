@@ -16,6 +16,7 @@ struct TaskSheet: View {
   // If nil, we're adding a new task. If set, we're editing.
   let existingTask: Task?
   let defaultCategory: TaskCategory?
+  let initialDate: Date?
 
   // Basic info
   @State private var title = ""
@@ -92,9 +93,10 @@ struct TaskSheet: View {
     isEditing ? "Details" : "New Task"
   }
 
-  init(task: Task? = nil, defaultCategory: TaskCategory? = nil) {
+  init(task: Task? = nil, defaultCategory: TaskCategory? = nil, initialDate: Date? = nil) {
     self.existingTask = task
     self.defaultCategory = defaultCategory
+    self.initialDate = initialDate
   }
 
   var body: some View {
@@ -121,11 +123,11 @@ struct TaskSheet: View {
           Spacer(minLength: 40)
         }
       }
-      .background(Color(.systemGroupedBackground))
+      .background(Color.systemGroupedBackground)
       .navigationTitle(sheetTitle)
-      .navigationBarTitleDisplayMode(.inline)
+      .toolbarTitleDisplayMode(.inline)
       .toolbar {
-        ToolbarItem(placement: .topBarLeading) {
+        ToolbarItem(placement: .platformTopBarLeading) {
           Button {
             dismiss()
           } label: {
@@ -136,7 +138,7 @@ struct TaskSheet: View {
           }
         }
 
-        ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItem(placement: .platformTopBarTrailing) {
           Button {
             saveTask()
           } label: {
@@ -196,14 +198,16 @@ struct TaskSheet: View {
 
       TextField("URL", text: $url)
         .focused($focusedField, equals: .url)
+        #if os(iOS)
         .keyboardType(.URL)
         .textContentType(.URL)
         .autocapitalization(.none)
+        #endif
         .foregroundStyle(.secondary)
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
     }
-    .background(Color(.secondarySystemGroupedBackground))
+    .background(Color.secondarySystemGroupedBackground)
     .clipShape(RoundedRectangle(cornerRadius: 12))
     .padding(.horizontal, 16)
     .padding(.top, 16)
@@ -234,7 +238,7 @@ struct TaskSheet: View {
         // Urgent Toggle
         urgentRow
       }
-      .background(Color(.secondarySystemGroupedBackground))
+      .background(Color.secondarySystemGroupedBackground)
       .clipShape(RoundedRectangle(cornerRadius: 12))
       .padding(.horizontal, 16)
 
@@ -322,7 +326,7 @@ struct TaskSheet: View {
         .padding(.vertical, 12)
       }
     }
-    .background(Color(.secondarySystemGroupedBackground))
+    .background(Color.secondarySystemGroupedBackground)
     .clipShape(RoundedRectangle(cornerRadius: 12))
     .padding(.horizontal, 16)
     .padding(.top, 16)
@@ -371,7 +375,7 @@ struct TaskSheet: View {
           .padding(.vertical, 12)
         }
       }
-      .background(Color(.secondarySystemGroupedBackground))
+      .background(Color.secondarySystemGroupedBackground)
       .clipShape(RoundedRectangle(cornerRadius: 12))
       .padding(.horizontal, 16)
 
@@ -419,7 +423,7 @@ struct TaskSheet: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
       }
-      .background(Color(.secondarySystemGroupedBackground))
+      .background(Color.secondarySystemGroupedBackground)
       .clipShape(RoundedRectangle(cornerRadius: 12))
       .padding(.horizontal, 16)
       .padding(.top, 16)
@@ -548,11 +552,18 @@ struct TaskSheet: View {
       .padding(.vertical, 10)
 
       if showTimePicker && hasTime {
+        #if os(iOS)
         DatePicker("", selection: $selectedTime, displayedComponents: .hourAndMinute)
           .datePickerStyle(.wheel)
           .frame(height: 150)
           .padding(.horizontal, 16)
           .transition(.opacity.combined(with: .move(edge: .top)))
+        #else
+        DatePicker("", selection: $selectedTime, displayedComponents: .hourAndMinute)
+          .labelsHidden()
+          .padding(.horizontal, 16)
+          .transition(.opacity.combined(with: .move(edge: .top)))
+        #endif
       }
     }
   }
@@ -612,7 +623,7 @@ struct TaskSheet: View {
       .frame(maxWidth: .infinity)
       .padding(.vertical, 14)
     }
-    .background(Color(.secondarySystemGroupedBackground))
+    .background(Color.secondarySystemGroupedBackground)
     .glassEffect(.regular.tint(.red))
     .clipShape(RoundedRectangle(cornerRadius: 12))
     .padding(.horizontal, 16)
@@ -645,6 +656,10 @@ struct TaskSheet: View {
       }
     } else {
       selectedCategory = defaultCategory ?? .reminders
+      if let initialDate = initialDate {
+        hasDate = true
+        selectedDate = initialDate
+      }
     }
   }
 
@@ -674,7 +689,7 @@ struct TaskSheet: View {
 
     let priority: TaskPriority = isUrgent ? .high : selectedPriority
 
-    if var task = existingTask {
+    if let task = existingTask {
       task.title = title.trimmingCharacters(in: .whitespaces)
       task.notes = notes
       task.url = url

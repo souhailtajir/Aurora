@@ -36,12 +36,13 @@ struct SmartListCard: View {
           .lineLimit(1)
       }
       .padding(LayoutTokens.Padding.cardInner(for: sizeClass))
+      .padding(.horizontal, LayoutTokens.Spacing.md)
       .frame(height: LayoutTokens.CardHeight.smartList)
       .frame(maxWidth: .infinity, alignment: .leading)
       .contentShape(Rectangle())
     }
     .buttonStyle(.plain)
-    .glassEffect(.clear.tint(listType.tintColor.opacity(0.3)))
+    .glassEffect(.clear.tint(listType.tintColor.opacity(0.3)), in: .capsule)
   }
 
   @ViewBuilder

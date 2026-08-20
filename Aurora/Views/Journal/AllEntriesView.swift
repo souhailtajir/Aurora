@@ -9,7 +9,6 @@ struct AllEntriesView: View {
   @Environment(TaskStore.self) var taskStore
   @Environment(\.dismiss) var dismiss
   @State private var searchText = ""
-  @State private var isSearching = false
   @State private var selectedEntry: JournalEntry?
   @Environment(\.horizontalSizeClass) private var sizeClass
 
@@ -88,30 +87,16 @@ struct AllEntriesView: View {
       }
     }
     .listStyle(.plain)
+    .platformListRowSpacing(0)
     .scrollContentBackground(.hidden)
     .scrollIndicators(.hidden)
     .background(Color.clear.auroraBackground())
+    #if os(iOS)
     .toolbar(.hidden, for: .tabBar)
-    .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
-        Button("Search", systemImage: "magnifyingglass") {
-          withAnimation {
-            isSearching = true
-          }
-        }
-      }
-    }
-    .safeAreaInset(edge: .bottom) {
-      if isSearching {
-        BottomSearchBar(
-          text: $searchText,
-          isSearching: $isSearching,
-          placeholder: "Search entries..."
-        )
-        .transition(.move(edge: .bottom).combined(with: .opacity))
-      }
-    }
-    .animation(.spring(response: 0.35, dampingFraction: 0.8), value: isSearching)
+    #elseif os(macOS)
+    .toolbarBackground(.hidden, for: .windowToolbar)
+    #endif
+    .searchable(text: $searchText, prompt: "Search entries...")
     .navigationDestination(for: JournalEntry.self) { entry in
       EntryEditorView(entryId: entry.id)
     }

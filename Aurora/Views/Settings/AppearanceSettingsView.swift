@@ -74,7 +74,9 @@ struct AppearanceSettingsView: View {
     .navigationTitle("Appearance")
     .toolbarTitleDisplayMode(.inlineLarge)
     .safeAreaPadding(.top, 8)
+    #if os(iOS)
     .toolbar(.hidden, for: .tabBar)
+    #endif
   }
 
   private func iconForAppearance(_ option: String) -> String {
