@@ -301,7 +301,7 @@ struct TasksView: View {
       }
       .padding(.horizontal, LayoutTokens.Padding.cardInner(for: sizeClass))
       .padding(.vertical, LayoutTokens.Padding.rowVertical)
-      .glassEffect()
+      .glassEffect(.clear)
     }
     .buttonStyle(.plain)
   }
