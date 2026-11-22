@@ -7,11 +7,17 @@
 
 import SwiftUI
 import SwiftData
+
+#if canImport(UIKit)
 import UIKit
+#endif
 
 @main
 struct AuroraApp: App {
+  #if os(iOS)
   @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+  #endif
+
   let container: ModelContainer
   @State private var taskStore: TaskStore
   @State private var userProfileStore = UserProfileStore()
@@ -41,6 +47,20 @@ struct AuroraApp: App {
         .environment(userProfileStore)
         .preferredColorScheme(.dark)
     }
+    #if os(macOS)
+    .windowStyle(.hiddenTitleBar)
+    .windowToolbarStyle(.unified(showsTitle: false))
+    .defaultSize(width: 1000, height: 700)
+    #endif
     .modelContainer(container)
+
+    #if os(macOS)
+    Settings {
+      SettingsView()
+        .environment(taskStore)
+        .environment(userProfileStore)
+        .frame(minWidth: 500, minHeight: 400)
+    }
+    #endif
   }
 }

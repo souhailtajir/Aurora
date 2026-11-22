@@ -42,13 +42,15 @@ struct SmartListsCustomizationSheet: View {
         }
       }
       .navigationTitle("Smart Lists")
-      .navigationBarTitleDisplayMode(.inline)
+      .toolbarTitleDisplayMode(.inline)
       .toolbar {
-        ToolbarItem(placement: .topBarLeading) {
+        #if os(iOS)
+        ToolbarItem(placement: .platformTopBarLeading) {
           EditButton()
         }
+        #endif
 
-        ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItem(placement: .platformTopBarTrailing) {
           Button("Done") {
             taskStore.visibleSmartLists = visibleSmartLists
             taskStore.smartListOrder = smartListOrder

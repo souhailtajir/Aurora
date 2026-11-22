@@ -2,10 +2,12 @@
 //  Aurora
 //
 
+#if os(iOS)
 import AVFoundation
 import CoreLocation
-import PhotosUI
 import Speech
+#endif
+import PhotosUI
 import SwiftUI
 
 struct EntryEditorView: View {
@@ -19,19 +21,24 @@ struct EntryEditorView: View {
   @State private var selectedPhoto: PhotosPickerItem?
   @FocusState private var titleFocused: Bool
   @FocusState private var bodyFocused: Bool
+  @Environment(\.horizontalSizeClass) private var sizeClass
 
   // Toolbar state
   @State private var showCamera = false
   @State private var showMagicAlert = false
+  #if os(iOS)
   @State private var locationService = LocationService()
+  #endif
   @State private var isLoadingLocation = false
 
+  #if os(iOS)
   // Dictation state
   @State private var isDictating = false
   @State private var speechRecognizer = SFSpeechRecognizer(locale: Locale.current)
   @State private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
   @State private var recognitionTask: SFSpeechRecognitionTask?
   @State private var audioEngine = AVAudioEngine()
+  #endif
 
   private var entry: JournalEntry? {
     taskStore.journalEntries.first { $0.id == entryId }
@@ -50,23 +57,25 @@ struct EntryEditorView: View {
     .navigationTitle(title.isEmpty ? "New Entry" : title)
     .toolbarTitleDisplayMode(.inline)
     .navigationBarBackButtonHidden(true)
+    #if os(iOS)
     .toolbar(.hidden, for: .tabBar)
+    #endif
     .toolbar {
-      ToolbarItem(placement: .topBarLeading) {
+      ToolbarItem(placement: .platformTopBarLeading) {
         Button {
           dismiss()
         } label: {
           Image(systemName: "chevron.left")
-            .font(.system(size: 16, weight: .semibold))
+            .font(.system(size: LayoutTokens.Typography.body, weight: .semibold))
         }
       }
 
-      ToolbarItem(placement: .topBarTrailing) {
+      ToolbarItem(placement: .platformTopBarTrailing) {
         Button {
           dismiss()
         } label: {
           Image(systemName: "checkmark")
-            .font(.system(size: 16, weight: .bold))
+            .font(.system(size: LayoutTokens.Typography.body, weight: .bold))
         }
         .buttonStyle(.glassProminent)
         .tint(Theme.primary)
@@ -78,12 +87,14 @@ struct EntryEditorView: View {
     .onAppear {
       loadEntry()
     }
+    #if os(iOS)
     .fullScreenCover(isPresented: $showCamera) {
       CameraPicker { imageData in
         addImageToEntry(imageData)
       }
       .ignoresSafeArea()
     }
+    #endif
     .alert("Writing Tools", isPresented: $showMagicAlert) {
       Button("OK", role: .cancel) {}
     } message: {
@@ -96,11 +107,11 @@ struct EntryEditorView: View {
   // MARK: - Bottom Toolbar
 
   private var bottomToolbar: some View {
-    HStack(spacing: 28) {
+    HStack(spacing: LayoutTokens.Spacing.xl) {
       // Photo library picker
       PhotosPicker(selection: $selectedPhoto, matching: .images) {
         Image(systemName: "photo.on.rectangle")
-          .font(.system(size: 22))
+          .font(.system(size: LayoutTokens.IconSize.lg))
           .foregroundStyle(Theme.tint)
       }
       .onChange(of: selectedPhoto) { _, newItem in
@@ -109,12 +120,13 @@ struct EntryEditorView: View {
         }
       }
 
+      #if os(iOS)
       // Camera
       Button {
         requestCameraAccess()
       } label: {
         Image(systemName: "camera")
-          .font(.system(size: 22))
+          .font(.system(size: LayoutTokens.IconSize.lg))
           .foregroundStyle(Theme.tint)
       }
 
@@ -123,7 +135,7 @@ struct EntryEditorView: View {
         toggleDictation()
       } label: {
         Image(systemName: isDictating ? "mic.fill" : "waveform")
-          .font(.system(size: 22))
+          .font(.system(size: LayoutTokens.IconSize.lg))
           .foregroundStyle(isDictating ? .red : Theme.tint)
           .symbolEffect(.pulse, isActive: isDictating)
       }
@@ -137,38 +149,39 @@ struct EntryEditorView: View {
             .tint(Theme.tint)
         } else {
           Image(systemName: entry?.locationName != nil ? "location.fill" : "location")
-            .font(.system(size: 22))
+            .font(.system(size: LayoutTokens.IconSize.lg))
             .foregroundStyle(entry?.locationName != nil ? Theme.primary : Theme.tint)
         }
       }
+      #endif
 
       // Magic wand / writing tools
       Button {
         showMagicAlert = true
       } label: {
         Image(systemName: "wand.and.stars")
-          .font(.system(size: 22))
+          .font(.system(size: LayoutTokens.IconSize.lg))
           .foregroundStyle(Theme.tint)
       }
     }
-    .padding(.horizontal, 20)
-    .padding(.vertical, 10)
+    .padding(.horizontal, LayoutTokens.Spacing.xl)
+    .padding(.vertical, LayoutTokens.Spacing.sm + 2)
     .background {
       Capsule()
         .glassEffect(.clear)
     }
-    .padding(.horizontal, 24)
-    .padding(.bottom, 8)
+    .padding(.horizontal, LayoutTokens.Spacing.xxl)
+    .padding(.bottom, LayoutTokens.Spacing.sm)
   }
 
   // MARK: - Editor Content
 
   private var editorContent: some View {
     ScrollView(showsIndicators: false) {
-      VStack(alignment: .leading, spacing: 12) {
+      VStack(alignment: .leading, spacing: LayoutTokens.Spacing.md) {
         // Title field
         TextField("Title", text: $title)
-          .font(.system(size: 22, weight: .medium))
+          .font(.system(size: LayoutTokens.Typography.title2, weight: .medium))
           .foregroundStyle(.primary)
           .focused($titleFocused)
           .submitLabel(.next)
@@ -180,15 +193,15 @@ struct EntryEditorView: View {
 
         // Location badge
         if let locationName = entry?.locationName {
-          HStack(spacing: 6) {
+          HStack(spacing: LayoutTokens.Spacing.xs) {
             Image(systemName: "location.fill")
-              .font(.system(size: 12))
+              .font(.system(size: LayoutTokens.Typography.caption))
             Text(locationName)
-              .font(.system(size: 13))
+              .font(.system(size: LayoutTokens.Typography.footnote))
           }
           .foregroundStyle(Theme.primary)
-          .padding(.horizontal, 10)
-          .padding(.vertical, 6)
+          .padding(.horizontal, LayoutTokens.Spacing.sm + 2)
+          .padding(.vertical, LayoutTokens.Spacing.xs + 2)
           .background {
             Capsule()
               .fill(Theme.primary.opacity(0.15))
@@ -199,13 +212,13 @@ struct EntryEditorView: View {
         ZStack(alignment: .topLeading) {
           if entryBody.isEmpty {
             Text("Start writing...")
-              .font(.system(size: 17))
+              .font(.system(size: LayoutTokens.Typography.body + 1))
               .foregroundStyle(.secondary.opacity(0.5))
-              .padding(.top, 8)
+              .padding(.top, LayoutTokens.Spacing.sm)
           }
 
           TextEditor(text: $entryBody)
-            .font(.system(size: 17))
+            .font(.system(size: LayoutTokens.Typography.body + 1))
             .foregroundStyle(.primary)
             .scrollContentBackground(.hidden)
             .frame(minHeight: 300)
@@ -220,20 +233,20 @@ struct EntryEditorView: View {
 
         Spacer(minLength: 100)
       }
-      .padding(.horizontal, 20)
-      .padding(.top, 16)
+      .padding(.horizontal, LayoutTokens.Padding.screenHorizontal(for: sizeClass))
+      .padding(.top, LayoutTokens.Spacing.lg)
     }
   }
 
   // MARK: - Empty State
 
   private var emptyState: some View {
-    VStack(spacing: 16) {
+    VStack(spacing: LayoutTokens.Spacing.lg) {
       Image(systemName: "doc.questionmark")
-        .font(.system(size: 40))
+        .font(.system(size: LayoutTokens.Typography.emptyStateIcon + 4))
         .foregroundStyle(.secondary)
       Text("Entry not found")
-        .font(.system(size: 16))
+        .font(.system(size: LayoutTokens.Typography.body))
         .foregroundStyle(.secondary)
     }
   }
@@ -243,9 +256,9 @@ struct EntryEditorView: View {
   private func imagesGrid(_ images: [Data]) -> some View {
     LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], spacing: 8) {
       ForEach(Array(images.enumerated()), id: \.offset) { index, data in
-        if let uiImage = UIImage(data: data) {
+        if let image = Image(data: data) {
           ZStack(alignment: .topTrailing) {
-            Image(uiImage: uiImage)
+            image
               .resizable()
               .scaledToFill()
               .frame(width: 80, height: 80)
@@ -255,7 +268,7 @@ struct EntryEditorView: View {
               removeImage(at: index)
             } label: {
               Image(systemName: "xmark.circle.fill")
-                .font(.system(size: 18))
+                .font(.system(size: LayoutTokens.IconSize.md))
                 .symbolRenderingMode(.palette)
                 .foregroundStyle(.white, .black.opacity(0.5))
             }
@@ -309,6 +322,7 @@ struct EntryEditorView: View {
     taskStore.updateJournalEntry(entry)
   }
 
+  #if os(iOS)
   private func requestCameraAccess() {
     switch AVCaptureDevice.authorizationStatus(for: .video) {
     case .authorized:
@@ -444,4 +458,5 @@ struct EntryEditorView: View {
 
     try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
   }
+  #endif
 }

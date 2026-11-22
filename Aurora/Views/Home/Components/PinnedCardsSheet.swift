@@ -151,18 +151,20 @@ struct PinnedCardsSheet: View {
           Text("Categories")
         }
       }
+      #if os(iOS)
       .environment(\.editMode, .constant(isEditing ? .active : .inactive))
+      #endif
       .navigationTitle("Pinned Cards")
-      .navigationBarTitleDisplayMode(.inline)
+      .toolbarTitleDisplayMode(.inline)
       .toolbar {
-        ToolbarItem(placement: .topBarLeading) {
+        ToolbarItem(placement: .platformTopBarLeading) {
           Button(isEditing ? "Done" : "Edit") {
             withAnimation {
               isEditing.toggle()
             }
           }
         }
-        ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItem(placement: .platformTopBarTrailing) {
           Button("Save") {
             saveAndDismiss()
           }

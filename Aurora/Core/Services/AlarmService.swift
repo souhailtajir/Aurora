@@ -6,6 +6,8 @@
 //  Created by souhail on 12/30/25.
 //
 
+#if os(iOS)
+
 import ActivityKit
 import AlarmKit
 import SwiftUI
@@ -135,3 +137,27 @@ class AlarmService {
     }
   }
 }
+
+#elseif os(macOS)
+
+import SwiftUI
+
+/// macOS stub — AlarmKit is not available on Mac.
+/// All methods are no-ops, keeping the call-site API identical.
+@MainActor
+@Observable
+class AlarmService {
+  static let shared = AlarmService()
+
+  var isAuthorized = false
+
+  private init() {}
+
+  func checkAuthorization() async {}
+  func requestAuthorization() async -> Bool { false }
+  func scheduleUrgentAlarm(for task: Task) async {}
+  func cancelAlarm(for task: Task) async {}
+  func hasAlarm(for taskId: UUID) -> Bool { false }
+}
+
+#endif

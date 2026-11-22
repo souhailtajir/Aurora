@@ -25,7 +25,11 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
   }
 
   func requestPermission() {
+    #if os(iOS)
     locationManager.requestWhenInUseAuthorization()
+    #elseif os(macOS)
+    locationManager.requestAlwaysAuthorization()
+    #endif
   }
 
   func getCurrentLocation() async -> CLLocation? {
@@ -39,12 +43,21 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
       try? await AsyncTask.sleep(nanoseconds: 500_000_000)
     }
 
+    #if os(iOS)
     guard authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways
     else {
       isLoading = false
       lastError = "Location access not authorized"
       return nil
     }
+    #elseif os(macOS)
+    guard authorizationStatus == .authorizedAlways || authorizationStatus == .authorized
+    else {
+      isLoading = false
+      lastError = "Location access not authorized"
+      return nil
+    }
+    #endif
 
     return await withCheckedContinuation { continuation in
       locationContinuation = continuation
@@ -53,13 +66,10 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
   }
 
   func reverseGeocode(_ location: CLLocation) async -> String? {
-    guard let request = MKReverseGeocodingRequest(location: location) else {
-      return nil
-    }
-
+    let geocoder = CLGeocoder()
     do {
-      let mapItems = try await request.mapItems
-      if let placemark = mapItems.first?.placemark {
+      let placemarks = try await geocoder.reverseGeocodeLocation(location)
+      if let placemark = placemarks.first {
         var components: [String] = []
         if let locality = placemark.locality {
           components.append(locality)

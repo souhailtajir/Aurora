@@ -5,6 +5,7 @@
 //  Created by Antigravity AI on 12/7/25.
 //
 
+#if os(iOS)
 import SwiftUI
 import UIKit
 
@@ -45,3 +46,4 @@ struct CameraPickerView: UIViewControllerRepresentable {
         }
     }
 }
+#endif

@@ -9,8 +9,8 @@ struct AllEntriesView: View {
   @Environment(TaskStore.self) var taskStore
   @Environment(\.dismiss) var dismiss
   @State private var searchText = ""
-  @State private var isSearching = false
   @State private var selectedEntry: JournalEntry?
+  @Environment(\.horizontalSizeClass) private var sizeClass
 
   private var entries: [JournalEntry] {
     let sorted = taskStore.journalEntries.sorted { $0.date > $1.date }
@@ -39,29 +39,29 @@ struct AllEntriesView: View {
   var body: some View {
     List {
       // Header
-      VStack(alignment: .leading, spacing: 4) {
+      VStack(alignment: .leading, spacing: LayoutTokens.Spacing.xs) {
         Text("All Entries")
-          .font(.system(size: 28, weight: .bold))
+          .font(.system(size: LayoutTokens.Typography.largeTitle, weight: .bold))
         Text("\(taskStore.journalEntries.count) entries")
-          .font(.system(size: 14))
+          .font(.system(size: LayoutTokens.Typography.subheadline))
           .foregroundStyle(.secondary)
       }
-      .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 8, trailing: 16))
+      .listRowInsets(EdgeInsets(top: LayoutTokens.Spacing.lg, leading: LayoutTokens.Padding.screenHorizontal(for: sizeClass), bottom: LayoutTokens.Spacing.sm, trailing: LayoutTokens.Padding.screenHorizontal(for: sizeClass)))
       .listRowBackground(Color.clear)
       .listRowSeparator(.hidden)
 
       // Empty state or entries
       if entries.isEmpty {
-        VStack(spacing: 12) {
+        VStack(spacing: LayoutTokens.Spacing.md) {
           Image(systemName: "book.closed")
-            .font(.system(size: 36))
+            .font(.system(size: LayoutTokens.Typography.emptyStateIcon))
             .foregroundStyle(.secondary.opacity(0.5))
           Text("No entries yet")
-            .font(.system(size: 15))
+            .font(.system(size: LayoutTokens.Typography.callout))
             .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 60)
+        .padding(.vertical, LayoutTokens.Spacing.xxl * 3)
         .listRowInsets(EdgeInsets())
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
@@ -73,13 +73,13 @@ struct AllEntriesView: View {
               JournalEntryRow(entry: entry) {
                 selectedEntry = entry
               }
-              .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+              .listRowInsets(LayoutTokens.listRowInsets(vertical: LayoutTokens.Spacing.xs, for: sizeClass))
               .listRowBackground(Color.clear)
               .listRowSeparator(.hidden)
             }
           } header: {
             Text(month)
-              .font(.system(size: 14, weight: .semibold))
+              .font(.system(size: LayoutTokens.Typography.subheadline, weight: .semibold))
               .foregroundStyle(Theme.tint)
               .textCase(nil)
           }
@@ -87,30 +87,16 @@ struct AllEntriesView: View {
       }
     }
     .listStyle(.plain)
+    .platformListRowSpacing(0)
     .scrollContentBackground(.hidden)
     .scrollIndicators(.hidden)
     .background(Color.clear.auroraBackground())
+    #if os(iOS)
     .toolbar(.hidden, for: .tabBar)
-    .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
-        Button("Search", systemImage: "magnifyingglass") {
-          withAnimation {
-            isSearching = true
-          }
-        }
-      }
-    }
-    .safeAreaInset(edge: .bottom) {
-      if isSearching {
-        BottomSearchBar(
-          text: $searchText,
-          isSearching: $isSearching,
-          placeholder: "Search entries..."
-        )
-        .transition(.move(edge: .bottom).combined(with: .opacity))
-      }
-    }
-    .animation(.spring(response: 0.35, dampingFraction: 0.8), value: isSearching)
+    #elseif os(macOS)
+    .toolbarBackground(.hidden, for: .windowToolbar)
+    #endif
+    .searchable(text: $searchText, prompt: "Search entries...")
     .navigationDestination(for: JournalEntry.self) { entry in
       EntryEditorView(entryId: entry.id)
     }

@@ -52,7 +52,7 @@ struct TaskEditSheet: View {
                 .padding(.vertical, 20)
             }
             .navigationTitle("Edit Task")
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") {
@@ -114,8 +114,10 @@ struct TaskEditSheet: View {
             TextField("URL (optional)", text: $draftTask.url)
                 .font(.system(size: 14))
                 .foregroundStyle(.blue)
+                #if os(iOS)
                 .keyboardType(.URL)
                 .autocapitalization(.none)
+                #endif
                 .focused($focusedField, equals: .url)
         }
         .padding(16)
